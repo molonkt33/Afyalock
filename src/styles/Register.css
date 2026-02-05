@@ -1,0 +1,13 @@
+.register-card {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.register-card img {
+  height: 100%;
+  object-fit: cover;
+}
+

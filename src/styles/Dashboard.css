@@ -1,0 +1,9 @@
+.dashboard-title {
+  color: #333;
+}
+
+.dashboard-cards .card {
+  border-radius: 12px;
+  background-color: #fff;
+  text-align: center;
+}
