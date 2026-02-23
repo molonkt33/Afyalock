@@ -1,10 +1,9 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import "../styles/Register.css";
-import registerPicture from "../assets/register.jpg";
+import { useNavigate, Link } from "react-router-dom";
+// Using the same CSS file as Login to ensure the UI is identical
+import "../styles/LoginPage.css"; 
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -12,62 +11,85 @@ const RegisterPage = () => {
   const formik = useFormik({
     initialValues: { name: "", email: "", password: "" },
     validationSchema: Yup.object({
-      name: Yup.string().required("Name required"),
-      email: Yup.string().email("Invalid email").required("Email required"),
-      password: Yup.string().min(6, "Min 6 characters").required("Password required"),
+      name: Yup.string().required("Required"),
+      email: Yup.string().email("Invalid email").required("Required"),
+      password: Yup.string()
+        .min(6, "Min 6 characters")
+        .required("Required"),
     }),
-    onSubmit: (values) => {
-      alert(`Registering ${values.name}`);
-      navigate("/login");
+    onSubmit: async (values) => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+
+        if (res.ok) {
+          alert("Registration successful!");
+          navigate("/login");
+        } else {
+          const data = await res.json();
+          alert(data.message || "Registration failed");
+        }
+      } catch (error) {
+        alert("Server error, please try again!");
+      }
     },
   });
 
   return (
-    <div className="d-flex">
-      <Sidebar />
-      <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
-        <div className="register-card shadow-sm row">
-          <div className="col-md-6 p-4">
-            <h3 className="mb-3">Register Staff</h3>
-            <form onSubmit={formik.handleSubmit}>
-              <input
-                className="form-control mb-2"
-                name="name"
-                placeholder="Full Name"
-                {...formik.getFieldProps("name")}
-              />
-              {formik.touched.name && formik.errors.name && (
-                <small className="text-danger">{formik.errors.name}</small>
-              )}
+    /* Shared classes from LoginPage.css to ensure perfect centering */
+    <div className="login-page"> 
+      <div className="login-card">
+        <div className="login-form">
+          <h2>Create Account</h2>
+          <p style={{ textAlign: 'center', color: '#666', marginBottom: '20px' }}>
+            Join MedVault today
+          </p>
 
-              <input
-                className="form-control mt-3 mb-2"
-                name="email"
-                placeholder="Email"
-                {...formik.getFieldProps("email")}
-              />
-              {formik.touched.email && formik.errors.email && (
-                <small className="text-danger">{formik.errors.email}</small>
-              )}
+          <form onSubmit={formik.handleSubmit}>
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              {...formik.getFieldProps("name")}
+            />
+            {formik.touched.name && formik.errors.name && (
+              <div className="error">{formik.errors.name}</div>
+            )}
 
-              <input
-                className="form-control mt-3 mb-2"
-                type="password"
-                name="password"
-                placeholder="Password"
-                {...formik.getFieldProps("password")}
-              />
-              {formik.touched.password && formik.errors.password && (
-                <small className="text-danger">{formik.errors.password}</small>
-              )}
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              {...formik.getFieldProps("email")}
+            />
+            {formik.touched.email && formik.errors.email && (
+              <div className="error">{formik.errors.email}</div>
+            )}
 
-              <button className="btn btn-success w-100 mt-4" type="submit">
-                Register
-              </button>
-            </form>
-          </div>
-          <div className="col-md-6">
-            <img src={registerPicture} alt="register" className="img-fluid rounded" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+            //   name="password"
+              {...formik.getFieldProps("password")}
+            />
+            {formik.touched.password && formik.errors.password && (
+              <div className="error">{formik.errors.password}</div>
+            )}
+
+            <button type="submit" className="login-button">
+              Register
+            </button>
+          </form>
+
+          <div className="login-links">
+            Already have an account?{" "}
+            <Link to="/login" className="register-link">
+              Login
+            </Link>
           </div>
         </div>
       </div>

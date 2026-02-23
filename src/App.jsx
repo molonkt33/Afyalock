@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
@@ -7,31 +8,19 @@ import ActivePatients from "./pages/ActivePatients";
 import PatientHistory from "./pages/PatientHistory";
 import UserPage from "./pages/UserPage";
 
-// ProtectedRoute component
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(role)) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
-
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public routes */}
+
+        {/* ---------------- PUBLIC ROUTES ---------------- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected routes */}
+        {/* ---------------- PROTECTED ROUTES ---------------- */}
+
+        {/* Dashboard - any logged in user */}
         <Route
           path="/dashboard"
           element={
@@ -40,22 +29,28 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Active Patients - Doctor & Admin */}
         <Route
           path="/active-patients"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
               <ActivePatients />
             </ProtectedRoute>
           }
         />
+
+        {/* Patient History - Doctor, Admin, Nurse */}
         <Route
           path="/patient-history"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["doctor", "admin", "nurse"]}>
               <PatientHistory />
             </ProtectedRoute>
           }
         />
+
+        {/* User Profile */}
         <Route
           path="/user"
           element={
@@ -65,7 +60,7 @@ function App() {
           }
         />
 
-        {/* Admin-only route example */}
+        {/* Admin Only Registration */}
         <Route
           path="/register-admin"
           element={
@@ -75,8 +70,9 @@ function App() {
           }
         />
 
-        {/* Catch-all redirect */}
+        {/* ---------------- DEFAULT REDIRECT ---------------- */}
         <Route path="*" element={<Navigate to="/login" replace />} />
+
       </Routes>
     </Router>
   );

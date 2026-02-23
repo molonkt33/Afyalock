@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/Navbar";
 import RoleGuard from "../components/RoleGuard";
 import "../styles/User.css";
 

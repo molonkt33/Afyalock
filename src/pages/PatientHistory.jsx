@@ -1,38 +1,77 @@
-import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import RoleGuard from "../components/RoleGuard";
+import React, { useState, useEffect } from "react";
 import "../styles/EventHistory.css";
 
 function PatientHistory() {
   const [history, setHistory] = useState([]);
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
-    // fetch history
-  }, []);
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/patients/history",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch patient history");
+        }
+
+        const data = await response.json();
+        setHistory(data);
+      } catch (error) {
+        console.error("Error fetching history:", error);
+      }
+    };
+
+    fetchHistory();
+  }, [token]);
 
   return (
-    <div className="d-flex">
-      <Sidebar />
-      <div className="flex-grow-1 p-5">
-        <h2 className="mb-4">Patient History</h2>
-        {history.length === 0 ? (
-          <p>No history available.</p>
-        ) : (
-          <div className="row">
-            {history.map((record) => (
-              <div key={record.id} className="col-md-6 mb-4">
-                <div className="card shadow-sm p-4">
-                  <h5>{record.name}</h5>
-                  <p>{record.summary}</p>
-                  <p>Discharged: {new Date(record.dischargeDate).toLocaleDateString()}</p>
-                  <RoleGuard allowedRoles={["admin", "doctor"]}>
-                    <button className="btn btn-warning mt-2">Edit Record</button>
-                  </RoleGuard>
-                </div>
+    <div className="profile-container p-4">
+      <h1 className="profile-title">Patient History</h1>
+      <hr className="my-4" />
+
+      <div className="row">
+        {history.map((patient) => (
+          <div key={patient.id} className="col-md-6 mb-4">
+            <div className="card naming-containers">
+              <div className="card-body">
+                <h2 className="card-title">{patient.fullName}</h2>
+
+                <p className="card-text">
+                  Diagnosis: {patient.diagnosis}
+                </p>
+
+                <p className="card-text">
+                  Ward: {patient.ward}
+                </p>
+
+                <p className="card-text">
+                  Admission Date: {patient.admissionDate}
+                </p>
+
+                <p className="card-text">
+                  Discharge Date: {patient.dischargeDate}
+                </p>
+
+                {/* Optional: Only Admin can permanently delete records */}
+                {role === "admin" && (
+                  <button className="btn btn-outline-danger mt-2">
+                    <i className="fa-solid fa-trash"></i> Remove Record
+                  </button>
+                )}
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

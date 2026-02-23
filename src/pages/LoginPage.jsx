@@ -2,16 +2,37 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
-import "../styles/LoginPage.css"; // Make sure this file exists
-import loginPicture from "../assets/login.jpg"; // Your doctor image
+import "../styles/LoginPage.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [notification, setNotification] = useState("");
 
+  // 🔐 Validate JWT expiration
+  const isTokenValid = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (!payload.exp) return false;
+
+      const currentTime = Date.now() / 1000;
+      return payload.exp > currentTime;
+    } catch {
+      return false;
+    }
+  };
+
+  // 🔐 Check existing session safely
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) navigate("/dashboard");
+
+    if (token && isTokenValid(token)) {
+      navigate("/dashboard");
+    } else {
+      // Clear invalid session data
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
+    }
   }, [navigate]);
 
   const formik = useFormik({
@@ -27,17 +48,21 @@ const LoginPage = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         });
+
         const data = await res.json();
-        if (data.token) {
+
+        if (res.ok && data.token) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("role", data.role);
           localStorage.setItem("user", JSON.stringify(data.user));
-          setNotification("");
+
           navigate("/dashboard");
         } else {
-          setNotification("Invalid credentials, please try again!");
+          setNotification(
+            data.message || "Invalid credentials, please try again!"
+          );
         }
-      } catch (error) {
+      } catch {
         setNotification("Server error, please try again!");
       }
     },
@@ -46,10 +71,13 @@ const LoginPage = () => {
   return (
     <div className="login-page">
       <div className="login-card">
-        {/* Left: form */}
         <div className="login-form">
           <h2>Welcome to MedVault</h2>
-          {notification && <div className="login-notification">{notification}</div>}
+
+          {notification && (
+            <div className="login-notification">{notification}</div>
+          )}
+
           <form onSubmit={formik.handleSubmit}>
             <input
               type="email"
@@ -58,8 +86,9 @@ const LoginPage = () => {
               {...formik.getFieldProps("email")}
             />
             {formik.touched.email && formik.errors.email && (
-              <small className="error">{formik.errors.email}</small>
+              <div className="error">{formik.errors.email}</div>
             )}
+
             <input
               type="password"
               name="password"
@@ -67,24 +96,22 @@ const LoginPage = () => {
               {...formik.getFieldProps("password")}
             />
             {formik.touched.password && formik.errors.password && (
-              <small className="error">{formik.errors.password}</small>
+              <div className="error">{formik.errors.password}</div>
             )}
+
             <button type="submit" className="login-button">
               Login
             </button>
           </form>
+
           <div className="login-links">
             <Link to="/forgot-password">Forgot Password?</Link>
-            <span> | </span>
+            <br />
+            Don’t have an account?{" "}
             <Link to="/register" className="register-link">
               Register
             </Link>
           </div>
-        </div>
-
-        {/* Right: image */}
-        <div className="login-image">
-          <img src={loginPicture} alt="Doctor" />
         </div>
       </div>
     </div>
