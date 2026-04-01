@@ -1,13 +1,13 @@
 
-# 🏥 MedVault
+# 🏥 AfyaLock
 
-MedVault is a role-based medical records management system designed to securely store, manage, and access patient and clinical data. It provides controlled access for different healthcare staff while maintaining data privacy and accountability.
+AfyaLock is a role-based medical records management system designed to securely store, manage, and access patient and clinical data. It provides controlled access for different healthcare staff while maintaining data privacy and accountability.
 
 ---
 
 ## 📌 Overview
 
-MedVault helps healthcare facilities digitize and organize patient information in a secure and efficient way. The system uses authentication, authorization, and role-based access control to ensure that users only see and perform actions allowed by their role.
+AfyaLock helps healthcare facilities digitize and organize patient information in a secure and efficient way. The system uses authentication, authorization, and role-based access control to ensure that users only see and perform actions allowed by their role.
 
 ---
 
