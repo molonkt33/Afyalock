@@ -1,0 +1,38 @@
+/* Global Modal Header Styling - White Labels on Blue */
+
+.modal-header {
+  background: linear-gradient(135deg, #05254d, #0a5d9e) !important;
+  color: white !important;
+  padding: 24px !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.modal-header h3 {
+  color: white !important;
+  font-family: "Poppins", sans-serif;
+  margin: 0 !important;
+}
+
+.modal-header label {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.modal-close {
+  color: white !important;
+}
+
+.modal-close:hover {
+  color: rgba(255,255,255,0.8) !important;
+}
+
+/* Apply to all modal form labels */
+.modal-content .form-group label {
+  color: white !important;
+}
+
+/* Specific page overrides */
+.prescription-modal .modal-header,
+.patient-modal .modal-header {
+  border-radius: 12px 12px 0 0 !important;
+}

@@ -1,0 +1,247 @@
+/* ================= NAVBAR BUTTONS CONTAINER ================= */
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navbar container */
+.navbar-ground {
+  background: linear-gradient(135deg, #05254d 0%, #0a3d6e 50%, #065a2e 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(5, 37, 77, 0.3);
+}
+
+/* Logo */
+.logo {
+  cursor: pointer;
+  color: white;
+}
+
+.med {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 3px;
+}
+
+.vault {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+/* Navigation links */
+.page-name {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.page-name li {
+  list-style: none;
+  cursor: pointer;
+  color: white !important;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.page-name li:hover {
+  color: #4ade80 !important;
+  transform: translateY(-2px);
+}
+
+.page-name li.active {
+  color: #4ade80 !important;
+  font-weight: 700;
+}
+
+.page-name li.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #22c55e;
+  border-radius: 2px;
+}
+
+/* White Buttons */
+.white-btn {
+  background: white;
+  color: #05254d;
+  border-radius: 50px;
+  padding: 6px 24px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.white-btn:hover {
+  background: #4ade80;
+  transform: translateY(-2px);
+}
+
+/* Avatar button */
+.navbar-avatar-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #065a2e 0%, #22c55e 100%);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.navbar-avatar-btn:hover {
+  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+
+/* Avatar initials */
+.avatar-initials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: white;
+}
+
+/* Chat Navigation Button */
+.chat-nav-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chat-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  color: #4ade80;
+}
+
+/* Large avatar in sidebar */
+.user-avatar-large .avatar-initials {
+  font-size: 24px;
+}
+
+/* Spinner */
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.spinner-overlay .spinner-grow {
+  pointer-events: auto;
+}
+
+/* ================= PROFILE DROPDOWN STYLES ================= */
+.profile-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 180px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 1000;
+  animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #05254d;
+}
+
+.dropdown-item.logout {
+  color: #dc2626;
+  border-top: 1px solid #f3f4f6;
+}
+
+.dropdown-item.logout:hover {
+  background: #fef2f2;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #f3f4f6;
+  margin: 0;
+}
+
+.dropdown-item svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+}
+
+.dropdown-item:hover svg {
+  color: #05254d;
+}
+
+.dropdown-item.logout svg {
+  color: #dc2626;
+}
