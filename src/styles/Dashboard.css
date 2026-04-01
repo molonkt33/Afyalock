@@ -1,197 +1,370 @@
-.hero-text {
+/* ================= GLOBAL ================= */
+
+body {
+  background: #f4f7fb;
   font-family: "Roboto", sans-serif;
-  font-size: 12px;
-  background: #05254d;
-  color: white;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  font-weight: 100;
-}
-.hero-text h1 {
-  font-family: "Russo One";
-  position: relative;
-  display: inline-block;
+  overflow-x: hidden;
 }
 
-.hero-text h1::after {
-  content: "";
-  position: absolute;
-  bottom: -5px;
-  left: -10px;
-  right: -10px;
-  height: 4px;
-  background-color: white;
+/* ================= HERO ================= */
+/* ================= HERO IMAGE ================= */
+
+.hero-wrapper {
+  width: 90%;
+  margin: 60px auto 0;
+  position: relative;
 }
 
 .top-image {
-  border-radius: 12px;
-}
-.forget-about {
-  font-size: 24px;
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  display: block;
+
+  /* Clean inward fade on all edges */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  mask-composite: intersect;
 }
 
-.category-heading {
-  font-family: "Russo One", sans-serif;
-  position: relative;
-  display: inline-block;
-  color: white;
-}
-.category-heading::after {
-  content: "";
-  position: absolute;
-  bottom: -5px;
-  left: -10px;
-  right: -10px;
-  height: 4px;
-  background-color: white;
-}
-.categories {
-  background-color: #05254d;
-}
-.category-card {
-  border-radius: 1px;
-}
-.category-description {
-  font-family: sans-serif;
-  font-size: 12px;
-  font-weight: 50;
-  color:white
-}
-.category-name {
-  font-family: sans-serif;
-  font-size: 18px;
-  font-weight: 550;
-  color:white
-}
+/* ================= HERO CARD ================= */
 
-.category-body img {
-  height: 320px;
-  border-radius: 12px;
-}
-.category-body .odd {
-  position: sticky;
-  bottom: 0px;
-}
-
-/* hhhhhhhhhhhhhh */
-
-.category-body {
-  position: relative;
+.hero-card-container {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  margin-top: 60px; /* separation from image */
 }
 
-.the-card {
+.hero-text {
+  width: 55%; /* SaaS premium width */
+  max-width: 700px;
+  background: linear-gradient(135deg, #05254d 0%, #065a2e 50%, #05254d 100%);
+  padding: 45px 50px;
+  border-radius: 22px;
+  color: white;
+  text-align: center;
+
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.18),
+    0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.hero-text h1 {
+  font-family: "Russo One", sans-serif;
+  letter-spacing: 2px;
+  font-size: 28px; /* smaller = premium */
+}
+
+.forget-about {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #dcdcdc;
+}
+/*================= DASHBOARD DESCRIPTION CARD ================= */
+
+.hero-text {
+  margin-top: -80px;  /* overlap image for luxury blend */
+  background: linear-gradient(135deg, #05254d 0%, #065a2e 50%, #05254d 100%);
+  padding: 80px 60px;
+  border-radius: 24px;
+  color: white;
   position: relative;
-  transition: transform 0.3s ease, opacity 3s ease;
-  border-radius: 190px;
-  /* background-color: rgb(247, 245, 245); */
-  
+  z-index: 10;
 
-  max-width: 300px;
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.the-card:hover {
-  transform: scale(1.05);
-  opacity: 1;
+.hero-text h1 {
+  font-family: "Russo One", sans-serif;
+  letter-spacing: 3px;
+  font-size: 36px;
+}
+
+.forget-about {
+  margin-top: 20px;
+  font-size: 19px;
+  color: #dcdcdc;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ================= CATEGORY SECTION ================= */
+
+.categories-section {
+  padding: 60px 20px;
+  background: linear-gradient(180deg, #05254d 0%, #065a2e 50%, #05254d 100%);
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.categories-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 0 3%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.category-card {
+  width: 100%;
+  min-width: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9f0 100%);
+  border-radius: 24px;
+  overflow: hidden;
   cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.ticket {
-  /* font-family: "Russo One"; */
-  font-weight:700;
-  margin-bottom: -24px;
-  margin-top: -12px;
-  color: rgb(103, 233, 103); 
-  /* color: #028043; */
-}
-.onclick {
-  /* font-family: "Russo One"; */
-  font-weight:700;
 
-  margin: -12px;
-  color: white;
+.category-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
 }
-.quotes {
-  font-size: 100px;
-  color: black;
+
+.category-content {
+  padding: 25px 150px;
 }
-.review-image {
-  max-width: 220px;
-  border-radius: 18px;
-}
-.reviews-section {
-  border-radius: 12px;
-  background: #05254d;
-  color:white
-}
-.reviews-section p {
-  font-family: "Roboto";
-  font-weight: 300;
-  font-size: 17px;
-  opacity: 0.8;
-}
-.static-numbers {
-  background: white;
-  border-radius: 12px;
-  padding: 10px;
-}
-.static-numbers h2 {
+
+.category-content h3 {
   font-family: "Russo One";
-  /* font-weight: 600; */
-  font-size: 32px;
+  font-size: 16px;
+  color: #05254d;
+  margin-bottom: 8px;
 }
-.static-numbers p {
-  opacity: 0.8;
-  font-family: "Roboto";
-  font-weight: 300;
+
+.category-content p {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
 }
-.statistics {
-  border-radius: 12px;
-  background: #05254d;
+
+.category-card:hover {
+  transform: translateY(-14px) scale(1.02);
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 30px 60px rgba(34, 197, 94, 0.3);
 }
-.our-part {
-  background: #05254d;
-  color: white;
+
+/* ================= RECORDS HEADING (matches about-heading but white) ================= */
+
+.section-heading {
+  font-family: "Russo One", sans-serif;
+  position: relative;
+  font-weight: 400;
+  color: #ffffff;
+  margin-bottom: 50px;
+  display: inline-block;
 }
-.our-part h5 {
-  font-weight: 600;
+
+.section-heading::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 10%;
+  right: 10%;
+  height: 4px;
+  background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+  border-radius: 4px;
+  pointer-events: none;
 }
-.our-part p {
-  opacity: 0.8;
-  font-family: "Roboto", sans-serif;
-  font-weight: 300;
-  font-size: 17px;
+
+/* subtitle beneath the records heading */
+.section-subtitle {
+  color: #ffffff;
+  font-size: 1.1rem;
 }
+
+/* ================= ABOUT ================= */
+
+.about-section {
+  background: #f4f6f9;
+  padding: 100px 40px;
+}
+
 .about-heading {
   font-family: "Russo One", sans-serif;
   position: relative;
-  font-weight: 300;
-
-
+  font-weight: 400;
   color: #05254d;
-  /* font-size: 46px; */
+  margin-bottom: 50px;
+  display: inline-block;
 }
+
 .about-heading::after {
   content: "";
   position: absolute;
-  bottom: -5px;
-  left: 10px;
-  right: 10px;
+  bottom: -6px;
+  left: 10%;
+  right: 10%;
   height: 4px;
   background-color: #05254d;
+  border-radius: 4px;
 }
-.abou {
-  background: rgb(250, 249, 249);
+
+.about-card {
+  background: white;
+  border-radius: 18px;
+  padding: 50px;
+  line-height: 1.8;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 }
-.footer-image-bg img {
+
+.about-card h5 {
+  font-family: "Russo One";
+  margin-top: 20px;
+  color: #05254d;
+}
+
+.about-card p {
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+}
+
+.review-box {
+  background: #05254d;
+  color: white;
+  border-radius: 18px;
+  padding: 35px;
+  line-height: 1.6;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.review-box i {
+  color: #22c55e;
+}
+
+.stat-box {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.stat-box:hover {
+  transform: translateY(-6px);
+}
+
+.stat-box h3 {
+  font-family: "Russo One";
+  font-size: 30px;
+  color: #05254d;
+}
+
+.stat-box p {
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 300;
+}
+
+/* ================= SPINNER ================= */
+
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  object-fit: cover;
-  max-height: 320px;
+  height: 100%;
+  background: rgba(5, 37, 77, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
 }
-.footer-image-bg {
-  background: #2a1e11;
+
+/* Make overlay non-blocking so inputs remain usable while debugging.
+   Remove or adjust once root cause is fixed. */
+.spinner-overlay {
+  pointer-events: none;
 }
-.category-body .card{
-  background: #028043;
+
+.spinner-overlay .spinner-grow {
+  pointer-events: auto;
 }
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+  .hero-wrapper {
+    width: 95%;
+  }
+
+  .hero-text {
+    padding: 50px 30px;
+  }
+
+  .top-image {
+    height: 420px;
+  }
+
+  .categories-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 4%;
+  }
+}
+
+@media (max-width: 768px) {
+  .categories-section {
+    padding: 40px 15px;
+    min-height: auto;
+  }
+
+  .categories-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 0 3%;
+  }
+
+  .category-card img {
+    height: 120px;
+  }
+
+  .section-heading {
+    font-size: 22px;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .categories-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 4%;
+  }
+
+  .category-card {
+    max-width: 100%;
+  }
+
+  .category-content {
+    padding: 20px;
+  }
+
+  .category-content h3 {
+    font-size: 14px;
+  }
+}
+

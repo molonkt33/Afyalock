@@ -1,19 +1,22 @@
 {
-  "name": "medvault-client",
+  "name": "afyalock-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
+  "start": "vite",      
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+},
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "bootstrap": "^5.3.3",
+    "formik": "^2.4.5",
+    "lucide-react": "^0.575.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.0",
-    "bootstrap": "^5.3.3",
-    "formik": "^2.4.5",
     "yup": "^1.3.3"
   },
   "devDependencies": {

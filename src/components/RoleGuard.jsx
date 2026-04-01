@@ -1,5 +1,5 @@
-// src/components/RoleGuard.jsx
 import React from "react";
+import { Navigate } from "react-router-dom";
 
 /**
  * RoleGuard component
@@ -8,38 +8,29 @@ import React from "react";
  */
 const RoleGuard = ({ children, allowedRoles }) => {
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  let role = localStorage.getItem("role") || "";
+  role = role.toLowerCase();
 
-  // 🔐 Validate JWT expiration
-  const isTokenValid = (token) => {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (!payload.exp) return false;
-
-      const currentTime = Date.now() / 1000;
-      return payload.exp > currentTime;
-    } catch {
-      return false;
-    }
-  };
-
-  // If no valid session → render nothing
-  if (!token || !isTokenValid(token)) {
-    return null;
+  // 🚫 Not logged in or no token
+  if (!token) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    return <Navigate to="/login" replace />;
   }
 
-  // If no role restriction → render normally
+  // 🔓 If no specific role restriction → allow
   if (!allowedRoles) {
     return <>{children}</>;
   }
 
-  // If role allowed → render
-  if (allowedRoles.includes(role)) {
+  // ✅ If role allowed → render (normalize allowed list)
+  const normalized = allowedRoles.map(r => r.toLowerCase());
+  if (normalized.includes(role)) {
     return <>{children}</>;
   }
 
-  // Otherwise → hide content
-  return null;
+  // ❌ Role not allowed
+  return <Navigate to="/dashboard" replace />;
 };
 
 export default RoleGuard;

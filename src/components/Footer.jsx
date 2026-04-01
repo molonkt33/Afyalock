@@ -1,80 +1,97 @@
-
-// src/components/Footer.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import "./Footer.css";
-import footerimage from "../assets/wetransfer_3-jpg_2024-11-08_0922/Screenshot 2024-11-12 at 10.31.57 PM.png";
-import { useLocation } from "react-router-dom";
+import footerimage from "../assets/footer.jpg";
 
 function Footer() {
-  const location = useLocation();
+
+  useEffect(() => {
+    const reveal = document.querySelector(".footer-content");
+    if (!reveal) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          reveal.classList.add("show-footer");
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(reveal);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <>
-      <footer className="footer">
-        <img
-          className="mb-5 img-fluid imgfooter"
+    <footer className="footer">
+
+      {/* Top Image */}
+      <div className="footer-image-wrapper">
+          <img
+          className="imgfooter"
           src={footerimage}
-          alt="MedVault Footer"
+          alt="AfyaLock Footer"
         />
+      </div>
 
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col">
-              <div className="pb-5 mx-5 container-fluid">
-                <div className="row">
-                  {/* System Information */}
-                  <div className="footer-logo col-md-4 mb-3">
-                    <h1 className="mb-3">MEDVAULT</h1>
+      {/* Content */}
+      <div className="footer-content container py-5">
 
-                    <p
-                      style={{ fontSize: "20px" }}
-                      className="mb-4 inquiries-paragraph"
-                    >
-                      Secure hospital record management system for patient
-                      data, medical history, and staff administration.
-                    </p>
+        <div className="row gy-5">
 
-                    <p>
-                      <i className="me-3 fa-solid fa-mobile"></i>
-                      +254 712 345 678
-                    </p>
+          {/* Brand Section */}
+          <div className="col-lg-4">
+            <h2 className="footer-brand">AFYALOCK</h2>
 
-                    <p>
-                      support@medvault.com
-                    </p>
-                  </div>
+            <p className="footer-description">
+              Secure hospital record management system for patient data,
+              medical history, and staff administration.
+            </p>
 
-                  <div className="col-md-4"></div>
-
-                  {/* System Links / Social */}
-                  <div className="col-md-4 mb-3">
-                    <h5 style={{ color: "white" }}>System Access</h5>
-
-                    <div className="d-flex flex-column social-icons">
-                      <a href="#" className="footer-icon">
-                        <i className="mx-2 fa-solid fa-shield-halved"></i>
-                        Secure Records
-                      </a>
-
-                      <a href="#" className="footer-icon">
-                        <i className="mx-2 fa-solid fa-user-doctor"></i>
-                        Medical Staff Portal
-                      </a>
-
-                      <a href="#" className="footer-icon">
-                        <i className="mx-2 fa-solid fa-hospital"></i>
-                        Hospital Management
-                      </a>
-                    </div>
-                  </div>
-                  {/* End Right Section */}
-                </div>
-              </div>
+            <div className="footer-contact">
+              <p><i className="fa-solid fa-phone me-2"></i>+254 757 358 409</p>
+              <p><i className="fa-solid fa-envelope me-2"></i>support@afyalock.com</p>
             </div>
           </div>
+
+          <div className="col-lg-2"></div>
+
+          {/* System Links */}
+          <div className="col-lg-4">
+            <h5 className="footer-heading">System Access</h5>
+
+            <ul className="footer-links">
+              <li>
+                <a href="#">
+                  <i className="fa-solid fa-shield-halved me-2"></i>
+                  Secure Records
+                </a>
+              </li>
+
+              <li>
+                <a href="#">
+                  <i className="fa-solid fa-user-doctor me-2"></i>
+                  Medical Staff Portal
+                </a>
+              </li>
+
+              <li>
+                <a href="#">
+                  <i className="fa-solid fa-hospital me-2"></i>
+                  Hospital Management
+                </a>
+              </li>
+            </ul>
+          </div>
+
         </div>
-      </footer>
-    </>
+
+        <div className="footer-bottom text-center mt-5">
+          <p>© {new Date().getFullYear()} AfyaLock. All Rights Reserved.</p>
+        </div>
+
+      </div>
+    </footer>
   );
 }
 
