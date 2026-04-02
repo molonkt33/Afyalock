@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+/* LogOut import removed */
 import { getInitials } from "../utils/getInitials";
 import "../styles/ActivePatients.css";
 
@@ -8,6 +9,7 @@ function UserPage() {
   const [search, setSearch] = useState("");
   const [view, setView] = useState("card");
   const [showMenu, setShowMenu] = useState(null);
+  const [starredUsers, setStarredUsers] = useState(new Set());
   const [loading, setLoading] = useState(true);
   
   // Modal states
@@ -35,10 +37,7 @@ function UserPage() {
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  // handleLogout removed - use Navbar logout
 
   // Role-based access for User Management:
   // - Admin: Full access (view, add, edit, remove)
@@ -292,9 +291,6 @@ function UserPage() {
                   <i className="fa-solid fa-plus"></i> Add Staff
                 </button>
               )}
-              <button className="userpage-logout-btn" onClick={handleLogout}>
-                <LogOut size={20} />
-              </button>
             </div>
           </div>
 
@@ -423,14 +419,36 @@ function UserPage() {
                         <i className="fa-solid fa-key"></i> Reset Password
                       </div>
 
-                      <div>
-                        <i className="fa-solid fa-star"></i> Star User
+                      <div onClick={() => {
+                        const starredUsersCopy = new Set(starredUsers);
+                        const userId = user._id || user.id;
+                        if (starredUsersCopy.has(userId)) {
+                          starredUsersCopy.delete(userId);
+                        } else {
+                          starredUsersCopy.add(userId);
+                        }
+                        setStarredUsers(starredUsersCopy);
+                        console.log(`Toggled star for ${user.fullName}`);
+                        setShowMenu(null);
+                      }}>
+                        <i className={`fa-solid fa-star ${starredUsers.has(user._id || user.id) ? 'text-warning' : ''}`}></i> 
+                        {starredUsers.has(user._id || user.id) ? ' Unstar' : ' Star'}
                       </div>
 
                       {canRemoveUser && (
-                        <div className="danger" onClick={() => handleToggleUserStatus(user)}>
-                          <i className={`fa-solid ${user.isActive !== false ? "fa-user-minus" : "fa-user-check"}`}></i> 
-                          {user.isActive !== false ? " Deactivate User" : " Activate User"}
+                        <div className="danger" onClick={() => {
+                          if (window.confirm(`Permanently delete ${user.fullName}? This cannot be undone.`)) {
+                            import("../services/api").then(({ default: api }) => {
+                              api.delete(`/users/${user._id}`).then(() => {
+                                fetchUsers();
+                              }).catch((err) => {
+                                alert('Delete failed: ' + (err.response?.data?.message || err.message));
+                              });
+                            });
+                          }
+                          setShowMenu(null);
+                        }}>
+                          <i className="fa-solid fa-user-xmark text-danger"></i> Remove User
                         </div>
                       )}
                     </div>
@@ -659,9 +677,9 @@ function UserPage() {
           align-items: center;
           margin-bottom: 20px;
         }
-        .modal-header h3 {
+.modal-header h3 {
           margin: 0;
-          color: #05254d;
+          color: #000000;
           font-family: "Russo One", sans-serif;
         }
         .modal-close {
@@ -672,17 +690,17 @@ function UserPage() {
           color: #64748b;
           line-height: 1;
         }
-        .modal-close:hover {
-          color: #05254d;
+.modal-close:hover {
+          color: #000000;
         }
         .form-group {
           margin-bottom: 15px;
         }
-        .form-group label {
+.form-group label {
           display: block;
           margin-bottom: 5px;
           font-weight: 600;
-          color: #05254d;
+          color: #000000;
         }
         .form-control {
           width: 100%;
@@ -692,10 +710,10 @@ function UserPage() {
           font-size: 14px;
           transition: 0.2s ease;
         }
-        .form-control:focus {
+.form-control:focus {
           outline: none;
-          border-color: #343f55;
-          box-shadow: 0 0 0 3px rgba(52, 63, 85, 0.1);
+          border-color: #000000;
+          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
         .modal-actions {
           display: flex;

@@ -659,9 +659,9 @@ function Radiology() {
           align-items: center;
           margin-bottom: 20px;
         }
-        .modal-header h3 {
+.modal-header h3 {
           margin: 0;
-          color: #05254d;
+          color: #000000;
           font-family: "Poppins", sans-serif;
         }
         .modal-close {
@@ -672,17 +672,17 @@ function Radiology() {
           color: #64748b;
           line-height: 1;
         }
-        .modal-close:hover {
-          color: #05254d;
+.modal-close:hover {
+          color: #000000;
         }
         .form-group {
           margin-bottom: 15px;
         }
-        .form-group label {
+.form-group label {
           display: block;
           margin-bottom: 5px;
           font-weight: 600;
-          color: #05254d;
+          color: #000000;
         }
         .form-control {
           width: 100%;
@@ -692,10 +692,10 @@ function Radiology() {
           font-size: 14px;
           transition: 0.2s ease;
         }
-        .form-control:focus {
+.form-control:focus {
           outline: none;
-          border-color: #05254d;
-          box-shadow: 0 0 0 3px rgba(5, 37, 77, 0.1);
+          border-color: #000000;
+          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
         .form-row {
           display: flex;
@@ -759,9 +759,9 @@ function Radiology() {
         .detail-row:last-child {
           border-bottom: none;
         }
-        .detail-row strong {
+.detail-row strong {
           min-width: 100px;
-          color: #05254d;
+          color: #000000;
           font-weight: 600;
         }
         .detail-row span {

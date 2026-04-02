@@ -587,9 +587,9 @@ function Emergency() {
           align-items: center;
           margin-bottom: 20px;
         }
-        .emergency-modal .modal-header h3 {
+.emergency-modal .modal-header h3 {
           margin: 0;
-          color: #05254d;
+          color: #000000;
           font-family: "Poppins", sans-serif;
         }
         .emergency-modal .modal-close {
@@ -606,11 +606,13 @@ function Emergency() {
         .emergency-modal .form-group {
           margin-bottom: 15px;
         }
-        .emergency-modal .form-group label {
+.emergency-modal .form-group label {
           display: block;
           margin-bottom: 5px;
-          font-weight: 600;
-          color: #05254d;
+          font-weight: 700;
+          color: #111111;
+          font-size: 15px;
+          text-shadow: 0 1px 1px rgba(0,0,0,0.3);
         }
         .emergency-modal .form-control {
           width: 100%;

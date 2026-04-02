@@ -562,9 +562,9 @@ const Prescriptions = () => {
           padding: 24px 24px 0 24px;
           margin-bottom: 20px;
         }
-        .modal-header h3 {
+.modal-header h3 {
           margin: 0;
-          color: #05254d;
+          color: #000000;
         }
         .modal-close {
           background: none;
@@ -592,16 +592,16 @@ const Prescriptions = () => {
           transition: all 0.2s ease;
           box-sizing: border-box;
         }
-        .form-control:focus {
+.form-control:focus {
           outline: none;
-          border-color: #05254d;
-          box-shadow: 0 0 0 3px rgba(5, 37, 77, 0.1);
+          border-color: #000000;
+          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
-        .form-group label {
+.form-group label {
           display: block;
           margin-bottom: 8px;
           font-weight: 600;
-          color: #05254d;
+          color: #000000;
         }
         .modal-actions {
           display: flex;
@@ -643,9 +643,9 @@ const Prescriptions = () => {
           align-items: center;
           margin-bottom: 24px;
         }
-        .dashboard-card-header h2 {
+.dashboard-card-header h2 {
           margin: 0;
-          color: #05254d;
+          color: #000000;
           font-size: 28px;
         }
         .controls {

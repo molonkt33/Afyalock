@@ -315,7 +315,7 @@ const Finance = () => {
             </div>
             <form onSubmit={handleCreatePayment}>
               <div className="form-group">
-                <label>Invoice Number *</label>
+<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Invoice Number *</label>
                 <input
                   type="text"
                   className="form-control"
@@ -325,7 +325,7 @@ const Finance = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Amount (KES) *</label>
+<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Amount (KES) *</label>
                 <input
                   type="number"
                   className="form-control"
@@ -337,7 +337,7 @@ const Finance = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Payment Method *</label>
+<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Payment Method *</label>
                 <select
                   className="form-control"
                   value={newPayment.paymentMethod}

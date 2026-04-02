@@ -8,7 +8,10 @@
 }
 
 .modal-header h3 {
-  color: white !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
   font-family: "Poppins", sans-serif;
   margin: 0 !important;
 }
@@ -16,6 +19,12 @@
 .modal-header label {
   color: white !important;
   font-weight: 600 !important;
+}
+.modal-content .form-group label {
+  color: #111111 !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
 }
 
 .modal-close {
@@ -28,7 +37,10 @@
 
 /* Apply to all modal form labels */
 .modal-content .form-group label {
-  color: white !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
 }
 
 /* Specific page overrides */

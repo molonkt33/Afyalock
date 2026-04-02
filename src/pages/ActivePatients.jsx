@@ -531,11 +531,13 @@ function ActivePatients() {
         .form-group {
           margin-bottom: 15px;
         }
-        .form-group label {
+.form-group label {
           display: block;
           margin-bottom: 5px;
-          font-weight: 600;
-          color: #05254d;
+          font-weight: 700;
+          color: #111111;
+          font-size: 15px;
+          text-shadow: 0 1px 1px rgba(0,0,0,0.3);
         }
         .form-control {
           width: 100%;
