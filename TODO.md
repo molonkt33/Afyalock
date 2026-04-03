@@ -1,10 +1,1 @@
-# Task: Add remove staff option to admin user management (UserPage.jsx)
-
-## Steps:
-- [x] 1. Add DELETE route to server/routes/userRoutes.js
-- [x] 2. Ensure deleteUser exported in server/controllers/userController.js (if needed)
-- [x] 3. Add handleRemoveUser function to src/pages/UserPage.jsx
-- [x] 4. Add "Remove User" dropdown item in src/pages/UserPage.jsx
-- [x] 5. Test functionality
-- [x] 6. Update TODO-USERMANAGEMENT-FIX.md and mark complete
-- [x] 7. attempt_completion
+# Vercel Deployment Fix TODO\n\n## Steps:\n\n- [x] Step 1: Update root package.json - Add build script and deps ✓\n- [x] Step 2: Update client/vite.config.js - Set outDir to '../dist', fix proxy ✓\n- [x] Step 3: Create root vercel.json - Monorepo config for static + API ✓\n- [x] Step 4: Test build locally - npm run build, verify dist/ ✓\n- [ ] Step 5: Test vercel dev\n- [ ] Step 6: Deploy - vercel --prod\n- [ ] Step 7: Cleanup - Remove server/vercel.json if conflicting\n\n**Current: Step 5**
