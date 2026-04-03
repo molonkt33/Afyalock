@@ -161,7 +161,13 @@ function OutPatients() {
 
   const filtered = patients.filter((p) =>
     p.fullName?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPatients.includes(a.id || a._id);
+    const bStarred = starredPatients.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   return (
     <div className="d-flex">
@@ -258,7 +264,7 @@ function OutPatients() {
           ) : (
             <div className="card-grid">
               {filtered.map((patient) => (
-                <div key={patient.id || patient._id} className="patient-card outpatient-card">
+                <div key={patient.id || patient._id} className={`patient-card outpatient-card ${starredPatients.includes(patient.id || patient._id) ? 'starred' : ''}`}>
                   <div className="patient-avatar">
                     {patient.profilePicture ? (
                       <img 
@@ -488,7 +494,7 @@ function OutPatients() {
         .modal-header h3 {
           margin: 0;
           color: #05254d;
-          font-family: "Poppins", sans-serif;
+          font-family: var(--base-font-family-default-latin);
         }
         .modal-close {
           background: none;

@@ -63,7 +63,20 @@ function PatientHistory() {
 
   const filtered = history.filter((patient) =>
     patient.fullName?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPatients.includes(a.id || a._id);
+    const bStarred = starredPatients.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
+
+  const getHistoryEventDate = (patient) => patient.dischargeDate || patient.deletedAt;
+  const getHistoryStatus = (patient) => {
+    if (patient.deletedAt) return "Removed";
+    if (patient.dischargeDate) return "Discharged";
+    return "Unknown";
+  };
 
   // Handle star/favorite patient
   const handleStarPatient = (patientId) => {
@@ -124,7 +137,7 @@ function PatientHistory() {
         <div className="dashboard-card">
           <div className="dashboard-card-header">
             <h2>Patient History</h2>
-            <span className="record-count">Discharged Patients</span>
+            <span className="record-count">History Records</span>
           </div>
 
           <div className="controls">
@@ -164,7 +177,7 @@ function PatientHistory() {
                     <th>Patient Name</th>
                     <th>Diagnosis</th>
                     <th>Ward</th>
-                    <th>Discharge Date</th>
+                    <th>Event Date</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -174,7 +187,7 @@ function PatientHistory() {
                       <td><strong>{patient.fullName || "Unknown"}</strong></td>
                       <td>{patient.diagnosis || "N/A"}</td>
                       <td>{patient.ward || "N/A"}</td>
-                      <td>{patient.dischargeDate || "N/A"}</td>
+                      <td>{getHistoryEventDate(patient) ? new Date(getHistoryEventDate(patient)).toLocaleDateString() : "N/A"}</td>
                       <td>
                         <div className="actions-cell">
                           {(role === "admin" || role === "doctor") && (
@@ -192,7 +205,7 @@ function PatientHistory() {
           ) : (
             <div className="card-grid">
               {filtered.map((patient) => (
-                <div key={patient.id || patient._id} className="patient-card history-card">
+                <div key={patient.id || patient._id} className={`patient-card history-card ${starredPatients.includes(patient.id || patient._id) ? 'starred' : ''}`}>
                   <div className="patient-avatar">
                     {patient.profilePicture ? (
                       <img 
@@ -209,7 +222,8 @@ function PatientHistory() {
                     <h4>{patient.fullName || "Unknown"}</h4>
                     <p><strong>Diagnosis:</strong> {patient.diagnosis || "N/A"}</p>
                     <p><strong>Ward:</strong> {patient.ward || "N/A"}</p>
-                    <p><strong>Discharged:</strong> {patient.dischargeDate || "N/A"}</p>
+                    <p><strong>Status:</strong> {getHistoryStatus(patient)}</p>
+                    <p><strong>Event Date:</strong> {getHistoryEventDate(patient) ? new Date(getHistoryEventDate(patient)).toLocaleDateString() : "N/A"}</p>
                     {(role === "admin" || role === "doctor") && (
                       <button className="view-details-btn">
                         <i className="fa-solid fa-file-medical"></i> View Details
@@ -281,8 +295,8 @@ function PatientHistory() {
                 <span>{selectedPatient.ward || "N/A"}</span>
               </div>
               <div className="detail-row">
-                <strong>Discharge Date:</strong>
-                <span>{selectedPatient.dischargeDate || "N/A"}</span>
+                <strong>Event Date:</strong>
+                <span>{getHistoryEventDate(selectedPatient) ? new Date(getHistoryEventDate(selectedPatient)).toLocaleDateString() : "N/A"}</span>
               </div>
             </div>
             <div className="modal-actions">
