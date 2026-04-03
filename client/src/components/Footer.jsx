@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "./Footer.css";
-import footerimage from "../assets/footer.jpg";
+import footerimage from "../assets/dashboard-images/footer.jpg";
 
 function Footer() {
 

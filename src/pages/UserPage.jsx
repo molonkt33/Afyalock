@@ -236,6 +236,27 @@ function UserPage() {
     }
   };
 
+  // Handle Remove User (permanent delete)
+  const handleRemoveUser = async (user) => {
+    if (!window.confirm(`Are you sure you want to permanently remove ${user.fullName}? This cannot be undone.`)) {
+      setShowMenu(null);
+      return;
+    }
+
+    try {
+      const { default: api } = await import("../services/api");
+      await api.delete(`/users/${user._id}`);
+      setUsers(users.filter(u => (u._id || u.id) !== user._id));
+      fetchUsers();
+      alert("User removed successfully");
+    } catch (err) {
+      console.error("Error removing user:", err);
+      alert(err.response?.data?.message || "Failed to remove user");
+    } finally {
+      setShowMenu(null);
+    }
+  };
+
   // Direct to profile
   const handleViewProfile = (user) => {
     localStorage.setItem('tempUser', JSON.stringify(user));
@@ -423,6 +444,11 @@ function UserPage() {
                         <div className="danger" onClick={() => handleToggleUserStatus(user)}>
                           <i className={`fa-solid ${user.isActive !== false ? "fa-user-minus" : "fa-user-check"}`}></i> 
                           {user.isActive !== false ? " Deactivate User" : " Activate User"}
+                        </div>
+                      )}
+                      {canRemoveUser && (
+                        <div className="danger" onClick={() => handleRemoveUser(user)}>
+                          <i className="fa-solid fa-user-xmark text-danger"></i> Remove User
                         </div>
                       )}
                     </div>

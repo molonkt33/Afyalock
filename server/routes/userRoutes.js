@@ -1,7 +1,10 @@
 // routes/userRoutes.js
 import express from "express";
-import User from "../models/User.js";
 import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
+import User from "../models/User.js";
+import asyncHandler from "express-async-handler";
+import { getUsers } from "../controllers/userController.js";
+import { deleteUser } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -189,6 +192,9 @@ router.get("/me", protect, async (req, res) => {
 
   res.json(user);
 });
+
+// DELETE user (admin only) - PERMANENT DELETE
+router.delete("/:id", protect, authorizeRoles("admin"), deleteUser);
 
 // LOG custom activity (for various user actions)
 router.post("/activity", protect, async (req, res) => {
