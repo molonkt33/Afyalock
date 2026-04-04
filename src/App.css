@@ -1,117 +1,88 @@
-/* =========================
-   Global Container
-   ========================= */
-
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: var(--base-font-family-default-latin);
-  background-color: #f5f5f5;
+  padding: var(--space-6);
+  background-color: var(--color-bg);
   min-height: 100vh;
-  color: #05254d;
+  color: var(--color-text);
 }
-
-/* =========================
-   Cards (Dashboard, Patients, History)
-   ========================= */
 
 .card {
-  padding: 2rem;
-  border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
+  padding: var(--space-lg);
+  border-radius: var(--radius);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--space-xl);
 }
 
-/* =========================
-   Buttons
-   ========================= */
-
 .btn {
-  border-radius: 8px;
-  padding: 10px 0;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  border-radius: calc(var(--radius) * 1.25);
+  padding: 0.95rem 1.15rem;
+  font-weight: var(--font-semibold);
+  transition: all 0.18s ease;
 }
 
 .btn-success {
-  background-color: #28a745;
+  background-color: var(--color-success);
   color: white;
 }
 
 .btn-success:hover {
-  background-color: #218838;
+  background-color: #13855a;
 }
 
-/* =========================
-   Forms
-   ========================= */
-
 .form-control {
-  border-radius: 8px;
-  border: 1px solid #ced4da;
-  padding: 10px;
-  margin-bottom: 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  padding: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  background: var(--color-surface);
 }
 
 .text-danger {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  color: var(--color-danger);
 }
-
-/* =========================
-   Page Titles
-   ========================= */
 
 .profile-title {
-  font-family: "Russo One", sans-serif;
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #05254d;
+  font-size: 2rem;
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-5);
+  color: var(--color-heading);
+  letter-spacing: -0.02em;
 }
-
-/* =========================
-   Images
-   ========================= */
 
 .img-fluid {
   max-width: 100%;
-  border-radius: 10px;
+  border-radius: var(--radius);
 }
 
-/* =========================
-   Alerts
-   ========================= */
-
 .alert {
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-weight: 600;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+  font-weight: var(--font-semibold);
 }
 
 .alert-success {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #ecfdf5;
+  color: #166534;
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #fef2f2;
+  color: #991b1b;
 }
-
-/* =========================
-   Responsive tweaks
-   ========================= */
 
 @media (max-width: 768px) {
   #root {
-    padding: 1rem;
+    padding: var(--space-4);
   }
   .profile-title {
     text-align: center;
   }
   .card {
-    padding: 1rem;
+    padding: var(--space-5);
   }
 }

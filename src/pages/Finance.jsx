@@ -102,6 +102,23 @@ const Finance = () => {
     setPatientSearch("");
   };
 
+  const openMpesaPrompt = () => {
+    setNewPayment({
+      amount: "",
+      paymentMethod: "mpesa",
+      patient: "",
+      prescription: "",
+      invoiceNumber: "",
+      mpesaPhone: "",
+      notes: ""
+    });
+    setSelectedPatient(null);
+    setPatientSearch("");
+    setStkStatus(null);
+    setCheckoutRequestID(null);
+    setShowAddModal(true);
+  };
+
   // Handle M-Pesa STK Payment
   const handleMpesaPayment = async (e) => {
     e.preventDefault();
@@ -362,7 +379,7 @@ const Finance = () => {
               Finance Management
             </h2>
             {canManage && (
-              <button className="primary-btn" onClick={() => setShowAddModal(true)}>
+              <button className="primary-btn" onClick={openMpesaPrompt}>
                 <i className="fa-solid fa-mobile-screen-button"></i> Send M-Pesa Prompt
               </button>
             )}
@@ -508,7 +525,7 @@ const Finance = () => {
             <h4>No Payments Found</h4>
             <p>No payment records match your filters.</p>
             {canManage && (
-              <button className="primary-btn mt-3" onClick={() => setShowAddModal(true)}>
+              <button className="primary-btn mt-3" onClick={openMpesaPrompt}>
                 <i className="fa-solid fa-mobile-screen-button"></i> Send M-Pesa Prompt
               </button>
             )}
@@ -580,8 +597,8 @@ const Finance = () => {
 
       {/* Add Payment Modal */}
       {showAddModal && (
-        <div className="modal-overlay" onClick={() => !stkLoading && setShowAddModal(false)}>
-          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay prescription-modal" onClick={() => !stkLoading && setShowAddModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '520px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3><i className="fa-solid fa-mobile-screen-button me-2"></i>M-Pesa Payment Prompt</h3>
               <button className="modal-close" onClick={() => !stkLoading && setShowAddModal(false)} disabled={stkLoading}>×</button>
