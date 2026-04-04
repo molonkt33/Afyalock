@@ -82,10 +82,14 @@ function Radiology() {
     }
     
     if (detailsId && scans.length > 0) {
-      const scan = scans.find(s => (s.id || s._id) === detailsId);
+      const scan = scans.find(s => {
+        const sId = String(s.id || s._id);
+        return sId === detailsId;
+      });
       if (scan) {
         setSelectedScan(scan);
         setShowDetailsModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   }, [searchParams, scans]);

@@ -85,10 +85,14 @@ function Emergency() {
     }
     
     if (detailsId && cases.length > 0) {
-      const emergencyCase = cases.find(c => (c.id || c._id) === detailsId);
+      const emergencyCase = cases.find(c => {
+        const cId = String(c.id || c._id);
+        return cId === detailsId;
+      });
       if (emergencyCase) {
         setSelectedCase(emergencyCase);
         setShowDetailsModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   }, [searchParams, cases]);

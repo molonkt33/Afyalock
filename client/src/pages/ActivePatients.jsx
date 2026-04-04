@@ -155,10 +155,14 @@ function ActivePatients() {
     }
     
     if (detailsId && patients.length > 0) {
-      const patient = patients.find(p => (p.id || p._id) === detailsId);
+      const patient = patients.find(p => {
+        const pId = String(p.id || p._id);
+        return pId === detailsId;
+      });
       if (patient) {
         setSelectedPatient(patient);
         setShowDetailsModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   }, [searchParams, patients]);

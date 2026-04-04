@@ -83,10 +83,14 @@ function Lab() {
     }
     
     if (detailsId && reports.length > 0) {
-      const report = reports.find(r => (r.id || r._id) === detailsId);
+      const report = reports.find(r => {
+        const rId = String(r.id || r._id);
+        return rId === detailsId;
+      });
       if (report) {
         setSelectedReport(report);
         setShowDetailsModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   }, [searchParams, reports]);

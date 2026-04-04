@@ -72,10 +72,14 @@ function PatientHistory() {
     }
     
     if (detailsId && history.length > 0) {
-      const patient = history.find(p => (p.id || p._id) === detailsId);
+      const patient = history.find(p => {
+        const pId = String(p.id || p._id);
+        return pId === detailsId;
+      });
       if (patient) {
         setSelectedPatient(patient);
         setShowDetailsModal(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   }, [searchParams, history]);

@@ -33,7 +33,7 @@ function Records() {
   const handleRowClick = (record) => {
     const route = getRouteForRecordType(record.recordType);
     const patientName = record.fullName || record.patient || record.name || "";
-    const recordId = record._id || record.id;
+    const recordId = String(record._id || record.id);
     
     // Navigate with parameters to open details directly
     const params = new URLSearchParams();
