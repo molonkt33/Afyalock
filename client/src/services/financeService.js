@@ -36,4 +36,22 @@ export const getRevenueReport = async (period = "month") => {
   return data;
 };
 
+// M-Pesa STK Push
+export const initiateMpesaSTK = async (phoneNumber, amount, invoiceNumber) => {
+  const { data } = await api.post("/finance/mpesa/stk", {
+    phoneNumber,
+    amount,
+    invoiceNumber,
+  });
+  return data;
+};
+
+// Query M-Pesa STK Status
+export const queryMpesaSTKStatus = async (checkoutRequestID) => {
+  const { data } = await api.post("/finance/mpesa/query", {
+    checkoutRequestID,
+  });
+  return data;
+};
+
 

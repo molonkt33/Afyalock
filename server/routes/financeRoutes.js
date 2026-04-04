@@ -5,7 +5,9 @@ import {
   createPayment,
   updatePayment,
   deletePayment,
-  getRevenueReport
+  getRevenueReport,
+  initiateStkPush,
+  queryStkStatus
 } from "../controllers/financeController.js";
 import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
 
@@ -53,6 +55,22 @@ router.delete("/payments/:id", protect, authorizeRoles("reception", "admin"), de
  * @query   ?period=day|week|month
  */
 router.get("/reports/revenue", protect, authorizeRoles("admin"), getRevenueReport);
+
+/**
+ * @route   POST /api/finance/mpesa/stk
+ * @desc    Initiate M-Pesa STK Push
+ * @access  Private (reception, admin)
+ * @body    { phoneNumber, amount, invoiceNumber }
+ */
+router.post("/mpesa/stk", protect, authorizeRoles("reception", "admin"), initiateStkPush);
+
+/**
+ * @route   POST /api/finance/mpesa/query
+ * @desc    Query M-Pesa STK Status
+ * @access  Private (reception, admin)
+ * @body    { checkoutRequestID }
+ */
+router.post("/mpesa/query", protect, authorizeRoles("reception", "admin"), queryStkStatus);
 
 export default router;
 

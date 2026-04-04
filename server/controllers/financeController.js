@@ -1,5 +1,6 @@
 import Payment from "../models/Payment.js";
 import asyncHandler from "express-async-handler";
+import { initiateMpesaSTK, queryMpesaSTKStatus } from "../utils/mpesa.js";
 
 // @desc    Get all payments
 // @route   GET /api/finance/payments
@@ -165,12 +166,76 @@ const getRevenueReport = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Initiate M-Pesa STK Push
+// @route   POST /api/finance/mpesa/stk
+// @access  Private (reception, admin)
+const initiateStkPush = asyncHandler(async (req, res) => {
+  const { phoneNumber, amount, invoiceNumber } = req.body;
+
+  if (!phoneNumber || !amount || !invoiceNumber) {
+    res.status(400);
+    throw new Error("Phone number, amount, and invoice number required");
+  }
+
+  try {
+    const response = await initiateMpesaSTK(phoneNumber, amount, invoiceNumber);
+    
+    res.status(200).json({
+      success: true,
+      message: "STK push initiated successfully",
+      data: {
+        checkoutRequestID: response.checkoutRequestID,
+        responseCode: response.responseCode,
+        responseDescription: response.responseDescription,
+        customerMessage: response.customerMessage,
+      }
+    });
+  } catch (error) {
+    res.status(400);
+    throw error;
+  }
+});
+
+// @desc    Query M-Pesa STK Status
+// @route   POST /api/finance/mpesa/query
+// @access  Private (reception, admin)
+const queryStkStatus = asyncHandler(async (req, res) => {
+  const { checkoutRequestID } = req.body;
+
+  if (!checkoutRequestID) {
+    res.status(400);
+    throw new Error("Checkout request ID required");
+  }
+
+  try {
+    const response = await queryMpesaSTKStatus(checkoutRequestID);
+    
+    // Determine if payment was successful
+    const isSuccess = response.resultCode === "0";
+
+    res.status(200).json({
+      success: true,
+      data: {
+        isSuccess,
+        resultCode: response.resultCode,
+        resultDesc: response.resultDesc,
+        mpesaReceiptNumber: response.mpesaReceiptNumber,
+      }
+    });
+  } catch (error) {
+    res.status(400);
+    throw error;
+  }
+});
+
 export {
   getPayments,
   getPaymentById,
   createPayment,
   updatePayment,
   deletePayment,
-  getRevenueReport
+  getRevenueReport,
+  initiateStkPush,
+  queryStkStatus
 };
 

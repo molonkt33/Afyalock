@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getInitials } from "../utils/getInitials";
 import "../styles/Prescriptions.css"; // Reuse payment cards
-import { getPayments, createPayment } from "../services/financeService.js";
+import { getPayments, createPayment, initiateMpesaSTK, queryMpesaSTKStatus } from "../services/financeService.js";
 import { getPatients, getPrescriptions } from "../services/patientService.js"; // For dropdowns
 
 const Finance = () => {
@@ -19,6 +19,11 @@ const Finance = () => {
 
   const [patients, setPatients] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
+
+  // M-Pesa STK state
+  const [stkStatus, setStkStatus] = useState(null);
+  const [checkoutRequestID, setCheckoutRequestID] = useState(null);
+  const [stkLoading, setStkLoading] = useState(false);
 
   // New payment form
   const [newPayment, setNewPayment] = useState({
@@ -97,8 +102,161 @@ const Finance = () => {
     setPatientSearch("");
   };
 
+  // Handle M-Pesa STK Payment
+  const handleMpesaPayment = async (e) => {
+    e.preventDefault();
+    
+    if (!newPayment.amount || !newPayment.patient || !newPayment.invoiceNumber) {
+      alert("Amount, patient and invoice required");
+      return;
+    }
+
+    if (!newPayment.mpesaPhone) {
+      alert("M-Pesa phone number required");
+      return;
+    }
+
+    setStkLoading(true);
+    setStkStatus(null);
+    
+    try {
+      console.log("📱 Initiating M-Pesa STK...");
+      
+      // Initiate STK Push
+      const stkResponse = await initiateMpesaSTK(
+        newPayment.mpesaPhone,
+        Math.round(newPayment.amount),
+        newPayment.invoiceNumber
+      );
+
+      console.log("✅ STK Response:", stkResponse);
+
+      if (stkResponse.success) {
+        setCheckoutRequestID(stkResponse.data.checkoutRequestID);
+        setStkStatus("initiated");
+        
+        // Show notification
+        alert(`✅ M-Pesa prompt sent to ${newPayment.mpesaPhone}. Please enter your PIN to complete payment.`);
+
+        // Poll status for 30 seconds
+        let pollCount = 0;
+        const pollInterval = setInterval(async () => {
+          pollCount++;
+          try {
+            const statusResponse = await queryMpesaSTKStatus(stkResponse.data.checkoutRequestID);
+            
+            if (statusResponse.data.isSuccess) {
+              clearInterval(pollInterval);
+              setStkStatus("success");
+              
+              // Now create payment in database with status "paid"
+              const paymentData = {
+                ...newPayment,
+                status: "paid",
+                mpesaRef: statusResponse.data.mpesaReceiptNumber
+              };
+
+              const result = await createPayment(paymentData);
+              setPayments([result.data, ...payments]);
+              
+              alert("✅ Payment successful! M-Pesa transaction completed.");
+              
+              // Reset form
+              setShowAddModal(false);
+              setNewPayment({
+                amount: "",
+                paymentMethod: "mpesa",
+                patient: "",
+                prescription: "",
+                invoiceNumber: "",
+                mpesaPhone: "",
+                notes: ""
+              });
+              setSelectedPatient(null);
+              setCheckoutRequestID(null);
+              setStkStatus(null);
+            } else if (statusResponse.data.resultCode !== "0" && pollCount > 30) {
+              // Payment failed or timeout
+              clearInterval(pollInterval);
+              setStkStatus("failed");
+              alert("❌ Payment failed or timeout. Please try again.");
+              
+              // Still save as pending if user wants
+              const confirmSave = window.confirm("Save payment as pending?");
+              if (confirmSave) {
+                const result = await createPayment({
+                  ...newPayment,
+                  status: "pending"
+                });
+                setPayments([result.data, ...payments]);
+                setShowAddModal(false);
+                setNewPayment({
+                  amount: "",
+                  paymentMethod: "mpesa",
+                  patient: "",
+                  prescription: "",
+                  invoiceNumber: "",
+                  mpesaPhone: "",
+                  notes: ""
+                });
+                setSelectedPatient(null);
+              }
+            }
+          } catch (err) {
+            console.error("Error polling status:", err);
+          }
+        }, 2000); // Poll every 2 seconds
+
+        // Stop polling after 30 polls (60 seconds)
+        setTimeout(() => clearInterval(pollInterval), 60000);
+      }
+    } catch (error) {
+      console.error("❌ M-Pesa Error:", error);
+      setStkStatus("failed");
+      
+      // Ask if user wants to save as pending
+      const confirmSave = window.confirm(
+        `M-Pesa prompt failed: ${error.response?.data?.message || error.message}\n\nSave payment as pending?`
+      );
+      
+      if (confirmSave) {
+        try {
+          const result = await createPayment({
+            ...newPayment,
+            status: "pending"
+          });
+          setPayments([result.data, ...payments]);
+          setShowAddModal(false);
+          setNewPayment({
+            amount: "",
+            paymentMethod: "mpesa",
+            patient: "",
+            prescription: "",
+            invoiceNumber: "",
+            mpesaPhone: "",
+            notes: ""
+          });
+          setSelectedPatient(null);
+          alert("Payment saved as pending.");
+        } catch (err) {
+          alert("Error saving payment");
+        }
+      }
+    } finally {
+      setStkLoading(false);
+    }
+  };
+
   const handleCreatePayment = async (e) => {
     e.preventDefault();
+    
+    // If M-Pesa, use STK flow
+    if (newPayment.paymentMethod === "mpesa") {
+      handleMpesaPayment(e);
+      return;
+    }
+
+    // For non-M-Pesa payments
     if (!newPayment.amount || !newPayment.patient || !newPayment.invoiceNumber) {
       alert("Amount, patient and invoice required");
       return;
@@ -422,12 +580,41 @@ const Finance = () => {
 
       {/* Add Payment Modal */}
       {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+        <div className="modal-overlay" onClick={() => !stkLoading && setShowAddModal(false)}>
           <div className="modal-content" style={{ maxWidth: '500px' }}>
             <div className="modal-header">
               <h3><i className="fa-solid fa-plus me-2"></i>New Payment Record</h3>
-              <button className="modal-close" onClick={() => setShowAddModal(false)}>×</button>
+              <button className="modal-close" onClick={() => !stkLoading && setShowAddModal(false)} disabled={stkLoading}>×</button>
             </div>
+
+            {/* STK Status Alert */}
+            {stkStatus && (
+              <div style={{
+                padding: '12px 16px',
+                margin: '0 0 16px 0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                ...(stkStatus === 'initiated' ? {
+                  background: '#dbeafe',
+                  color: '#1e40af',
+                  border: '1px solid #93c5fd'
+                } : stkStatus === 'success' ? {
+                  background: '#dcfce7',
+                  color: '#166534',
+                  border: '1px solid #86efac'
+                } : {
+                  background: '#fee2e2',
+                  color: '#991b1b',
+                  border: '1px solid #fca5a5'
+                })
+              }}>
+                <i className={`fa-solid ${stkStatus === 'initiated' ? 'fa-hourglass-middle' : stkStatus === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`} style={{ marginRight: '8px' }}></i>
+                {stkStatus === 'initiated' && '📱 M-Pesa prompt sent, waiting for PIN entry...'}
+                {stkStatus === 'success' && '✅ Payment successful!'}
+                {stkStatus === 'failed' && '❌ Payment failed. You can retry or save as pending.'}
+              </div>
+            )}
+
             <form onSubmit={handleCreatePayment}>
               <div className="form-group">
                 <label>Invoice Number *</label>
@@ -437,6 +624,7 @@ const Finance = () => {
                   value={newPayment.invoiceNumber}
                   onChange={(e) => setNewPayment({ ...newPayment, invoiceNumber: e.target.value })}
                   required
+                  disabled={stkLoading}
                 />
               </div>
               <div className="form-group">
@@ -449,6 +637,7 @@ const Finance = () => {
                   min="0"
                   step="0.01"
                   required
+                  disabled={stkLoading}
                 />
               </div>
               <div className="form-group">
@@ -456,8 +645,15 @@ const Finance = () => {
                 <select
                   className="form-control"
                   value={newPayment.paymentMethod}
-                  onChange={(e) => setNewPayment({ ...newPayment, paymentMethod: e.target.value })}
+                  onChange={(e) => {
+                    setNewPayment({ ...newPayment, paymentMethod: e.target.value });
+                    if (e.target.value !== "mpesa") {
+                      setStkStatus(null);
+                      setCheckoutRequestID(null);
+                    }
+                  }}
                   required
+                  disabled={stkLoading}
                 >
                   <option value="mpesa">M-Pesa</option>
                   <option value="cash">Cash</option>
@@ -466,16 +662,26 @@ const Finance = () => {
                   <option value="bank_transfer">Bank Transfer</option>
                 </select>
               </div>
-              <div className="form-group">
-                <label>M-Pesa Phone (if M-Pesa)</label>
-                <input
-                  type="tel"
-                  className="form-control"
-                  value={newPayment.mpesaPhone}
-                  onChange={(e) => setNewPayment({ ...newPayment, mpesaPhone: e.target.value })}
-                  placeholder="2547XXXXXXXX"
-                />
-              </div>
+
+              {/* Show M-Pesa Phone field when M-Pesa is selected */}
+              {newPayment.paymentMethod === "mpesa" && (
+                <div className="form-group">
+                  <label>M-Pesa Phone *</label>
+                  <input
+                    type="tel"
+                    className="form-control"
+                    value={newPayment.mpesaPhone}
+                    onChange={(e) => setNewPayment({ ...newPayment, mpesaPhone: e.target.value })}
+                    placeholder="2547XXXXXXXX (e.g., 254712345678)"
+                    required
+                    disabled={stkLoading}
+                  />
+                  <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                    💡 Format: 254XXXXXXXXX or 07XXXXXXXX (Kenya)
+                  </small>
+                </div>
+              )}
+
               <div className="form-group">
                 <label>Patient *</label>
                 <input
@@ -488,6 +694,7 @@ const Finance = () => {
                     setSelectedPatient(null);
                     setNewPayment(prev => ({ ...prev, patient: "" }));
                   }}
+                  disabled={stkLoading}
                 />
                 {selectedPatient && (
                   <div style={{ marginTop: '8px', padding: '12px', background: '#f0f9ff', borderRadius: '8px' }}>
@@ -501,6 +708,7 @@ const Finance = () => {
                   className="form-control"
                   value={newPayment.prescription}
                   onChange={(e) => setNewPayment({ ...newPayment, prescription: e.target.value })}
+                  disabled={stkLoading}
                 >
                   <option value="">No Prescription</option>
                   {prescriptions.map((prescription) => (
@@ -517,14 +725,74 @@ const Finance = () => {
                   rows="2"
                   value={newPayment.notes}
                   onChange={(e) => setNewPayment({ ...newPayment, notes: e.target.value })}
+                  disabled={stkLoading}
                 />
               </div>
+
+              {/* Get patient options for autocomplete */}
+              {patientSearch && !selectedPatient && patients.length > 0 && (
+                <div style={{
+                  background: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderTop: 'none',
+                  borderRadius: '0 0 8px 8px',
+                  maxHeight: '150px',
+                  overflowY: 'auto',
+                  margin: '-4px 0 12px 0'
+                }}>
+                  {patients
+                    .filter(p => p.fullName?.toLowerCase().includes(patientSearch.toLowerCase()))
+                    .map(patient => (
+                      <div
+                        key={patient._id}
+                        onClick={() => handlePatientSelect(patient)}
+                        style={{
+                          padding: '10px 12px',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid #e5e7eb',
+                          fontSize: '14px',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = '#efefef'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                      >
+                        <strong>{patient.fullName}</strong> • {patient.phone}
+                      </div>
+                    ))}
+                </div>
+              )}
+
               <div className="modal-actions">
-                <button type="submit" className="primary-btn" disabled={saving}>
-                  {saving ? "Saving..." : "Save Payment"}
+                <button
+                  type="submit"
+                  className="primary-btn"
+                  disabled={stkLoading || (newPayment.paymentMethod === "mpesa" && stkStatus === "success")}
+                  style={{
+                    opacity: stkLoading ? 0.6 : 1,
+                    cursor: stkLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {stkLoading ? (
+                    <>
+                      <i className="fa-solid fa-spinner animate-spin" style={{ marginRight: '8px' }}></i>
+                      Processing...
+                    </>
+                  ) : newPayment.paymentMethod === "mpesa" ? (
+                    <>
+                      <i className="fa-solid fa-mobile-screen-button" style={{ marginRight: '8px' }}></i>
+                      Send M-Pesa Prompt
+                    </>
+                  ) : (
+                    'Save Payment'
+                  )}
                 </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>
-                  Cancel
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowAddModal(false)}
+                  disabled={stkLoading}
+                >
+                  {stkLoading ? 'Wait...' : 'Cancel'}
                 </button>
               </div>
             </form>
@@ -537,6 +805,13 @@ const Finance = () => {
         .col-md-3 { flex: 1 1 calc(25% - 24px); padding: 0 12px; }
         @media (max-width: 768px) { 
           .col-md-3 { flex: 1 1 100%; }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
         }
       `}</style>
     </div>
