@@ -176,7 +176,7 @@ const Finance = () => {
             </h2>
             {canManage && (
               <button className="primary-btn" onClick={() => setShowAddModal(true)}>
-                <i className="fa-solid fa-plus"></i> Record Payment
+                <i className="fa-solid fa-mobile-screen-button"></i> Send M-Pesa Prompt
               </button>
             )}
           </div>
@@ -298,7 +298,7 @@ const Finance = () => {
             <p>No payment records match your filters.</p>
             {canManage && (
               <button className="primary-btn mt-3" onClick={() => setShowAddModal(true)}>
-                Record First Payment
+                <i className="fa-solid fa-mobile-screen-button"></i> Send M-Pesa Prompt
               </button>
             )}
           </div>
@@ -310,7 +310,7 @@ const Finance = () => {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3><i className="fa-solid fa-plus me-2"></i>New Payment Record</h3>
+              <h3><i className="fa-solid fa-mobile-screen-button me-2"></i>M-Pesa Payment Prompt</h3>
               <button className="modal-close" onClick={() => setShowAddModal(false)}>×</button>
             </div>
             <form onSubmit={handleCreatePayment}>
