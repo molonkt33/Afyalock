@@ -680,7 +680,7 @@ function UserPage() {
 .modal-header h3 {
           margin: 0;
           color: #000000;
-          font-family: "Russo One", sans-serif;
+          font-family: var(--base-font-family-default-latin);
         }
         .modal-close {
           background: none;

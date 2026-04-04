@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { getInitials } from "../utils/getInitials";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/ActivePatients.css";
 
 function PatientHistory() {
@@ -17,6 +17,7 @@ function PatientHistory() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Role-based access: admin, doctor, nurse can view patient history
   const canViewHistory = ["admin", "doctor", "nurse"].includes(role);
@@ -60,6 +61,24 @@ function PatientHistory() {
         .finally(() => setLoading(false));
     });
   }, [token, navigate, canViewHistory]);
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const detailsId = searchParams.get('details');
+    const searchQuery = searchParams.get('search');
+    
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+    
+    if (detailsId && history.length > 0) {
+      const patient = history.find(p => (p.id || p._id) === detailsId);
+      if (patient) {
+        setSelectedPatient(patient);
+        setShowDetailsModal(true);
+      }
+    }
+  }, [searchParams, history]);
 
   const filtered = history.filter((patient) =>
     patient.fullName?.toLowerCase().includes(search.toLowerCase())

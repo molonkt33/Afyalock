@@ -5,7 +5,7 @@
    display: flex;
    height: calc(100vh - 120px);
    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-   font-family: 'Poppins', sans-serif;
+   font-family: var(--base-font-family-default-latin);
    margin: 0;
    padding: 0;
  }

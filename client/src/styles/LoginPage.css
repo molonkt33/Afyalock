@@ -1,6 +1,6 @@
 /* ================= CSS VARIABLES ================= */
 :root {
-  --base-font-family-default-latin: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --base-font-family-default-latin: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --primary-navy: #05254d;
   --accent-navy: #05254d;
   --accent-navy-light: #0a3d6e;

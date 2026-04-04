@@ -12,6 +12,10 @@ const Finance = () => {
   const [filterMethod, setFilterMethod] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showMenu, setShowMenu] = useState(null);
+  const [starredPayments, setStarredPayments] = useState([]);
+  const [selectedPaymentForView, setSelectedPaymentForView] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const [patients, setPatients] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
@@ -125,6 +129,31 @@ const Finance = () => {
 
   const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
   const pendingTotal = payments.filter(p => p.status === "pending").reduce((sum, p) => sum + p.amount, 0);
+
+  const handleStarPayment = (paymentId) => {
+    const paymentKey = paymentId;
+    if (starredPayments.includes(paymentKey)) {
+      setStarredPayments(starredPayments.filter(id => id !== paymentKey));
+    } else {
+      setStarredPayments([...starredPayments, paymentKey]);
+    }
+    setShowMenu(null);
+  };
+
+  const handleViewPayment = (payment) => {
+    setSelectedPaymentForView(payment);
+    setShowDetailsModal(true);
+    setShowMenu(null);
+  };
+
+  const handleDeletePayment = (paymentId) => {
+    if (!window.confirm("Are you sure you want to delete this payment record?")) {
+      setShowMenu(null);
+      return;
+    }
+    setPayments(payments.filter(p => p._id !== paymentId));
+    setShowMenu(null);
+  };
 
   if (!canView) {
     return (
@@ -276,15 +305,39 @@ const Finance = () => {
                     {payment.patientFullName}
                   </div>
                   {payment.prescription && <p>Prescription: #{payment.prescription.invoiceNumber}</p>}
-                  <div className="card-actions">
-                    <button className="action-btn btn-view">View</button>
-                    {canManage && (
-                      <>
-                        <button className="action-btn btn-edit">Edit</button>
-                        <button className="action-btn btn-delete">Delete</button>
-                      </>
-                    )}
+                  
+                  <div
+                    className="card-menu"
+                    onClick={() =>
+                      setShowMenu(showMenu === payment._id ? null : payment._id)
+                    }
+                  >
+                    ⋮
                   </div>
+
+                  {showMenu === payment._id && (
+                    <div className="dropdown-menu">
+                      <div onClick={() => handleStarPayment(payment._id)}>
+                        <i className="fa-solid fa-star"></i> {starredPayments.includes(payment._id) ? "Unstar" : "Star"}
+                      </div>
+
+                      <div onClick={() => handleViewPayment(payment)}>
+                        <i className="fa-solid fa-eye"></i> View Details
+                      </div>
+
+                      {canManage && (
+                        <div onClick={() => window.alert("Edit functionality to be implemented")}>
+                          <i className="fa-solid fa-edit"></i> Edit
+                        </div>
+                      )}
+
+                      {canManage && (
+                        <div className="danger" onClick={() => handleDeletePayment(payment._id)}>
+                          <i className="fa-solid fa-trash"></i> Remove
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -305,6 +358,68 @@ const Finance = () => {
         )}
       </div>
 
+      {/* View Payment Details Modal */}
+      {showDetailsModal && selectedPaymentForView && (
+        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Payment Details</h3>
+              <button className="modal-close" onClick={() => setShowDetailsModal(false)}>×</button>
+            </div>
+            <div className="patient-details">
+              <div className="detail-row">
+                <strong>Invoice Number:</strong>
+                <span>#{selectedPaymentForView.invoiceNumber}</span>
+              </div>
+              <div className="detail-row">
+                <strong>Patient:</strong>
+                <span>{selectedPaymentForView.patientFullName || "N/A"}</span>
+              </div>
+              <div className="detail-row">
+                <strong>Amount:</strong>
+                <span style={{ fontSize: '18px', fontWeight: '700', color: '#05254d' }}>
+                  ₭ {selectedPaymentForView.amount.toLocaleString()}
+                </span>
+              </div>
+              <div className="detail-row">
+                <strong>Payment Method:</strong>
+                <span>
+                  <i className={getMethodIcon(selectedPaymentForView.paymentMethod)} style={{ marginRight: '8px', color: getMethodColor(selectedPaymentForView.paymentMethod) }}></i>
+                  {selectedPaymentForView.paymentMethod.replace('_', ' ').toUpperCase()}
+                </span>
+              </div>
+              <div className="detail-row">
+                <strong>Status:</strong>
+                <span className={`status-badge ${selectedPaymentForView.status === 'paid' ? 'status-active' : 'status-dispensed'}`}>
+                  {selectedPaymentForView.status.toUpperCase()}
+                </span>
+              </div>
+              <div className="detail-row">
+                <strong>Date:</strong>
+                <span>{new Date(selectedPaymentForView.createdAt).toLocaleDateString()}</span>
+              </div>
+              {selectedPaymentForView.mpesaPhone && (
+                <div className="detail-row">
+                  <strong>M-Pesa Phone:</strong>
+                  <span>{selectedPaymentForView.mpesaPhone}</span>
+                </div>
+              )}
+              {selectedPaymentForView.notes && (
+                <div className="detail-row">
+                  <strong>Notes:</strong>
+                  <span>{selectedPaymentForView.notes}</span>
+                </div>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowDetailsModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Payment Modal */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
@@ -315,7 +430,7 @@ const Finance = () => {
             </div>
             <form onSubmit={handleCreatePayment}>
               <div className="form-group">
-<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Invoice Number *</label>
+                <label>Invoice Number *</label>
                 <input
                   type="text"
                   className="form-control"
@@ -325,7 +440,7 @@ const Finance = () => {
                 />
               </div>
               <div className="form-group">
-<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Amount (KES) *</label>
+                <label>Amount (KES) *</label>
                 <input
                   type="number"
                   className="form-control"
@@ -337,7 +452,7 @@ const Finance = () => {
                 />
               </div>
               <div className="form-group">
-<label style="color: #111111 !important; font-weight: 700 !important; font-size: 15px !important; text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;">Payment Method *</label>
+                <label>Payment Method *</label>
                 <select
                   className="form-control"
                   value={newPayment.paymentMethod}

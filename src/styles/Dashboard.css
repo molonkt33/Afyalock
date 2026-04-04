@@ -2,7 +2,7 @@
 
 body {
   background: #f4f7fb;
-  font-family: "Roboto", sans-serif;
+  font-family: var(--base-font-family-default-latin);
   overflow-x: hidden;
 }
 
@@ -56,7 +56,7 @@ body {
 }
 
 .hero-text h1 {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   letter-spacing: 2px;
   font-size: 28px; /* smaller = premium */
 }
@@ -83,7 +83,7 @@ body {
 }
 
 .hero-text h1 {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   letter-spacing: 3px;
   font-size: 36px;
 }
@@ -146,7 +146,7 @@ body {
 }
 
 .category-content h3 {
-  font-family: "Russo One";
+  font-family: 'Pin Sans';
   font-size: 16px;
   color: #05254d;
   margin-bottom: 8px;
@@ -167,7 +167,7 @@ body {
 /* ================= RECORDS HEADING (matches about-heading but white) ================= */
 
 .section-heading {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   position: relative;
   font-weight: 400;
   color: #ffffff;
@@ -201,7 +201,7 @@ body {
 }
 
 .about-heading {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   position: relative;
   font-weight: 400;
   color: #05254d;

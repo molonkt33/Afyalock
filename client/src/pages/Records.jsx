@@ -33,11 +33,14 @@ function Records() {
   const handleRowClick = (record) => {
     const route = getRouteForRecordType(record.recordType);
     const patientName = record.fullName || record.patient || record.name || "";
-    if (patientName) {
-      navigate(`${route}?search=${encodeURIComponent(patientName)}`);
-    } else {
-      navigate(route);
-    }
+    const recordId = record._id || record.id;
+    
+    // Navigate with parameters to open details directly
+    const params = new URLSearchParams();
+    if (patientName) params.set('search', patientName);
+    if (recordId) params.set('details', recordId);
+    
+    navigate(`${route}?${params.toString()}`);
   };
 
   // Role-based access
@@ -104,7 +107,7 @@ function Records() {
   // Combine all records with type
   const allRecords = [
     ...activePatients.map(p => ({ ...p, recordType: "Active Patient", status: "Admitted" })),
-    ...patientHistory.map(p => ({ ...p, recordType: "Patient History", status: p.status || "Discharged" })),
+    ...patientHistory.map(p => ({ ...p, recordType: "Patient History", status: p.deletedAt ? "Removed" : (p.status || "Discharged") })),
     ...outPatients.map(p => ({ ...p, recordType: "OutPatient", status: p.status || "Pending" })),
     ...emergencyCases.map(c => ({ ...c, recordType: "Emergency", status: c.status || "Pending" })),
     ...labReports.map(l => ({ ...l, recordType: "Lab Report", status: l.status || "Pending", fullName: l.patient })),
@@ -252,8 +255,8 @@ function Records() {
                           {record.diagnosis || record.reason || record.condition || record.testName || record.scanType || "N/A"}
                         </td>
                         <td>
-                          {record.admissionDate || record.dischargeDate || record.visitDate || record.arrivalTime || record.createdAt ? 
-                            new Date(record.admissionDate || record.dischargeDate || record.visitDate || record.arrivalTime || record.createdAt).toLocaleDateString() 
+                          {record.admissionDate || record.dischargeDate || record.deletedAt || record.visitDate || record.arrivalTime || record.createdAt ? 
+                            new Date(record.admissionDate || record.dischargeDate || record.deletedAt || record.visitDate || record.arrivalTime || record.createdAt).toLocaleDateString() 
                             : "N/A"}
                         </td>
                         <td>

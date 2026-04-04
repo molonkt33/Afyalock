@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/ActivePatients.css";
 
 function Radiology() {
@@ -28,6 +28,7 @@ function Radiology() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Role-based access for Radiology:
   // - Admin, Doctor: Full access (view, schedule, upload, remove)
@@ -70,6 +71,24 @@ function Radiology() {
         .finally(() => setLoading(false));
     });
   }, [token, navigate]);
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const detailsId = searchParams.get('details');
+    const searchQuery = searchParams.get('search');
+    
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+    
+    if (detailsId && scans.length > 0) {
+      const scan = scans.find(s => (s.id || s._id) === detailsId);
+      if (scan) {
+        setSelectedScan(scan);
+        setShowDetailsModal(true);
+      }
+    }
+  }, [searchParams, scans]);
 
   // Access denied check
   if (!canViewScans) {
@@ -662,7 +681,7 @@ function Radiology() {
         .modal-header h3 {
           margin: 0;
           color: #05254d;
-          font-family: "Poppins", sans-serif;
+          font-family: var(--base-font-family-default-latin);
         }
         .modal-close {
           background: none;

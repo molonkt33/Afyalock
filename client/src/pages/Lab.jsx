@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/ActivePatients.css";
 
 function Lab() {
@@ -25,6 +25,7 @@ function Lab() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Role-based access for Lab:
   // - Admin, Doctor: Full access (view, order, upload, remove)
@@ -71,6 +72,24 @@ function Lab() {
         .finally(() => setLoading(false));
     });
   }, [token, navigate]);
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const detailsId = searchParams.get('details');
+    const searchQuery = searchParams.get('search');
+    
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+    
+    if (detailsId && reports.length > 0) {
+      const report = reports.find(r => (r.id || r._id) === detailsId);
+      if (report) {
+        setSelectedReport(report);
+        setShowDetailsModal(true);
+      }
+    }
+  }, [searchParams, reports]);
 
   // Access denied check
   if (!canViewReports) {
@@ -579,7 +598,7 @@ function Lab() {
         .modal-header h3 {
           margin: 0;
           color: #05254d;
-          font-family: "Poppins", sans-serif;
+          font-family: var(--base-font-family-default-latin);
         }
         .modal-close {
           background: none;

@@ -48,9 +48,11 @@ router.get("/active", protect, async (req, res, next) => {
 router.get("/history", protect, async (req, res, next) => {
   try {
     const patients = await Patient.find({
-      deletedAt: null,
-      dischargeDate: { $exists: true, $ne: null },
-    }).sort({ dischargeDate: -1 });
+      $or: [
+        { deletedAt: { $ne: null } },
+        { dischargeDate: { $ne: null } },
+      ],
+    }).sort({ deletedAt: -1, dischargeDate: -1 });
 
     res.json(patients);
   } catch (error) {
@@ -118,7 +120,7 @@ router.delete(
     try {
       const patient = await Patient.findByIdAndUpdate(
         req.params.id,
-        { deletedAt: new Date() },
+        { deletedAt: new Date(), isActive: false },
         { new: true }
       );
 

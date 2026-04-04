@@ -4,7 +4,7 @@
 .profile-page {
   background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #f0f4f8 100%);
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   position: relative;
   overflow-x: hidden;
 }
@@ -154,7 +154,7 @@
 }
 
 .profile-name {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 36px;
   color: white;
   margin: 0 0 8px 0;
@@ -188,7 +188,7 @@
 }
 
 .profile-stat-value {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 28px;
   color: white;
   display: block;
@@ -279,7 +279,7 @@
 }
 
 .premium-card-title {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 18px;
   color: #05254d;
   display: flex;
@@ -622,7 +622,7 @@
 
 .modal-header h3 {
   margin: 0;
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 20px;
 }
 

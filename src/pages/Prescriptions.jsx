@@ -12,6 +12,10 @@ const Prescriptions = () => {
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showMenu, setShowMenu] = useState(null);
+  const [starredPrescriptions, setStarredPrescriptions] = useState([]);
+  const [selectedPrescriptionForView, setSelectedPrescriptionForView] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // New prescription form state
   const [newPrescription, setNewPrescription] = useState({
@@ -148,6 +152,31 @@ const Prescriptions = () => {
       Dispensed: "pharmacy-dispensed"
     };
     return classes[status] || "";
+  };
+
+  const handleStarPrescription = (prescriptionId) => {
+    const prescriptionKey = prescriptionId;
+    if (starredPrescriptions.includes(prescriptionKey)) {
+      setStarredPrescriptions(starredPrescriptions.filter(id => id !== prescriptionKey));
+    } else {
+      setStarredPrescriptions([...starredPrescriptions, prescriptionKey]);
+    }
+    setShowMenu(null);
+  };
+
+  const handleViewPrescription = (prescription) => {
+    setSelectedPrescriptionForView(prescription);
+    setShowDetailsModal(true);
+    setShowMenu(null);
+  };
+
+  const handleDeletePrescription = (prescriptionId) => {
+    if (!window.confirm("Are you sure you want to delete this prescription?")) {
+      setShowMenu(null);
+      return;
+    }
+    setPrescriptions(prescriptions.filter(p => (p._id || p.id) !== prescriptionId));
+    setShowMenu(null);
   };
 
   if (!canView) {
@@ -295,21 +324,38 @@ const Prescriptions = () => {
                   </div>
                 )}
 
-                <div className="card-actions">
-                  <button className="action-btn btn-view">
-                    <i className="fa-solid fa-eye"></i> View
-                  </button>
-                  {canManage && (
-                    <>
-                      <button className="action-btn btn-edit">
-                        <i className="fa-solid fa-edit"></i> Edit
-                      </button>
-                      <button className="action-btn btn-delete">
-                        <i className="fa-solid fa-trash"></i> Delete
-                      </button>
-                    </>
-                  )}
+                <div
+                  className="card-menu"
+                  onClick={() =>
+                    setShowMenu(showMenu === (prescription._id || prescription.id) ? null : prescription._id || prescription.id)
+                  }
+                >
+                  ⋮
                 </div>
+
+                {showMenu === (prescription._id || prescription.id) && (
+                  <div className="dropdown-menu">
+                    <div onClick={() => handleStarPrescription(prescription._id || prescription.id)}>
+                      <i className="fa-solid fa-star"></i> {starredPrescriptions.includes(prescription._id || prescription.id) ? "Unstar" : "Star"}
+                    </div>
+
+                    <div onClick={() => handleViewPrescription(prescription)}>
+                      <i className="fa-solid fa-eye"></i> View Details
+                    </div>
+
+                    {canManage && (
+                      <div onClick={() => window.alert("Edit functionality to be implemented")}>
+                        <i className="fa-solid fa-edit"></i> Edit
+                      </div>
+                    )}
+
+                    {canManage && (
+                      <div className="danger" onClick={() => handleDeletePrescription(prescription._id || prescription.id)}>
+                        <i className="fa-solid fa-trash"></i> Remove
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -328,6 +374,68 @@ const Prescriptions = () => {
           </div>
         )}
       </div>
+
+      {/* View Prescription Details Modal */}
+      {showDetailsModal && selectedPrescriptionForView && (
+        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Prescription Details</h3>
+              <button className="modal-close" onClick={() => setShowDetailsModal(false)}>×</button>
+            </div>
+            <div className="patient-details">
+              <div className="detail-row">
+                <strong>Patient:</strong>
+                <span>{selectedPrescriptionForView.patientFullName || "N/A"}</span>
+              </div>
+              <div className="detail-row">
+                <strong>Status:</strong>
+                <span className={`status-badge ${getStatusClass(selectedPrescriptionForView.status)}`}>
+                  {selectedPrescriptionForView.status}
+                </span>
+              </div>
+              <div className="detail-row">
+                <strong>Pharmacy Status:</strong>
+                <span className={`pharmacy-badge ${getPharmacyClass(selectedPrescriptionForView.pharmacyStatus)}`}>
+                  {selectedPrescriptionForView.pharmacyStatus}
+                </span>
+              </div>
+              <div className="detail-row">
+                <strong>Date Prescribed:</strong>
+                <span>{new Date(selectedPrescriptionForView.datePrescribed).toLocaleDateString()}</span>
+              </div>
+              <div className="detail-row">
+                <strong>Prescribed By:</strong>
+                <span>{selectedPrescriptionForView.prescribedBy?.fullName || "N/A"}</span>
+              </div>
+              <div className="detail-row">
+                <strong>Medications:</strong>
+                <div>
+                  {selectedPrescriptionForView.medications.map((med, idx) => (
+                    <div key={idx} style={{ marginTop: idx > 0 ? '8px' : '0' }}>
+                      <strong>{med.name}</strong> - {med.dosage}
+                      <br />
+                      <small>Frequency: {med.frequency}, Duration: {med.duration}, Qty: {med.quantity}</small>
+                      {med.instructions && <><br /><small>Instructions: {med.instructions}</small></>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {selectedPrescriptionForView.notes && (
+                <div className="detail-row">
+                  <strong>Notes:</strong>
+                  <span>{selectedPrescriptionForView.notes}</span>
+                </div>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowDetailsModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Prescription Modal */}
       {showAddModal && (

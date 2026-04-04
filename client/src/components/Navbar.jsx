@@ -28,7 +28,7 @@ const getInitials = (name) => {
 
 function Navbar() {
   const [loading, setLoading] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileSidebar, setShowProfileSidebar] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,10 +38,23 @@ function Navbar() {
   const role = localStorage.getItem("role");
   const userObj = getStoredUser();
   
+  const getRoleDisplayName = (roleValue) => {
+    const roleNames = {
+      admin: "Administrator",
+      doctor: "Doctor",
+      nurse: "Nurse",
+      lab: "Lab Technician",
+      radiology: "Radiology Technician",
+      reception: "Receptionist",
+      emergency: "Emergency Staff",
+    };
+    return roleNames[roleValue] || "Staff";
+  };
+
   // Get user data
   const profilePicture = userObj?.profilePicture || "";
   const initials = getInitials(userObj?.fullName);
-  const roleDisplay = role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
+  const roleDisplay = getRoleDisplayName(role);
 
   const isLoggedIn = !!token;
   const path = location.pathname;
@@ -52,15 +65,15 @@ function Navbar() {
     if (path === route) return;
 
     setLoading(true);
-    setShowProfileMenu(false); // Close menu on navigation
+    setShowProfileSidebar(false);
     setTimeout(() => {
       navigate(route);
       setLoading(false);
     }, 400);
   };
 
-  const toggleProfileMenu = () => {
-    setShowProfileMenu(!showProfileMenu);
+  const toggleProfileSidebar = () => {
+    setShowProfileSidebar((prev) => !prev);
   };
 
   const handleScroll = (id) => {
@@ -87,7 +100,7 @@ function Navbar() {
   const handleLogout = () => {
     setLoading(true);
     localStorage.clear();
-    setShowProfileMenu(false);
+    setShowProfileSidebar(false);
     setTimeout(() => {
       navigate("/login");
       setLoading(false);
@@ -95,20 +108,6 @@ function Navbar() {
   };
 
   // ESCAPE KEY HANDLER removed - no longer needed for dropdown
-
-  /* ================= ROLE DISPLAY ================= */
-  const getRoleDisplayName = (role) => {
-    const roleNames = {
-      admin: "Administrator",
-      doctor: "Doctor",
-      nurse: "Nurse",
-      lab: "Lab Technician",
-      radiology: "Radiology Technician",
-      reception: "Receptionist",
-      emergency: "Emergency Staff",
-    };
-    return roleNames[role] || "Staff";
-  };
 
   return (
     <>
@@ -191,35 +190,31 @@ function Navbar() {
                   <MessageCircle size={20} />
                 </button>
 
-                {/* Profile Avatar - Direct to profile + dropdown */}
-                <div 
-                  className="profile-dropdown-container" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClick('/profile');
-                  }}
-                  onMouseEnter={() => setShowProfileMenu(true)}
-                  onMouseLeave={() => setShowProfileMenu(false)}
-                >
+                {/* Profile Avatar - open profile sidebar */}
+                <div className="profile-dropdown-container">
                   <button
                     className="navbar-avatar-btn"
                     type="button"
                     title="Profile"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleProfileSidebar();
+                    }}
                   >
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: "100%", 
-                        height: "100%", 
-                        borderRadius: "50%", 
-                        objectFit: "cover" 
-                      }} 
-                    />
-                  ) : (
-                    <span className="avatar-initials">{initials}</span>
-                  )}
+                    {profilePicture ? (
+                      <img 
+                        src={profilePicture} 
+                        alt="Profile" 
+                        style={{ 
+                          width: "100%", 
+                          height: "100%", 
+                          borderRadius: "50%", 
+                          objectFit: "cover" 
+                        }} 
+                      />
+                    ) : (
+                      <span className="avatar-initials">{initials}</span>
+                    )}
                   </button>
                 </div>
               </>
@@ -246,17 +241,67 @@ function Navbar() {
         )}
       </nav>
 
-      {/* ================= PROFILE DROPDOWN ================= */}
-      {isLoggedIn && showProfileMenu && (
-        <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
-          <div className="dropdown-item" onClick={() => handleClick('/profile')}>
-            <User size={16} />
-            <span>View Profile</span>
-          </div>
-          <div className="dropdown-divider" />
-          <div className="dropdown-item logout" onClick={handleLogout}>
-            <LogOut size={16} />
-            <span>Logout</span>
+      {/* ================= PROFILE SIDEBAR ================= */}
+      {isLoggedIn && (
+        <div
+          className={`profile-sidebar-overlay ${showProfileSidebar ? "active" : ""}`}
+          onClick={() => setShowProfileSidebar(false)}
+        >
+          <div
+            className={`profile-sidebar ${showProfileSidebar ? "open" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sidebar-header-custom">
+              <div>
+                <h3>Profile Menu</h3>
+                <p>{roleDisplay || "Staff"}</p>
+              </div>
+              <button className="close-sidebar-btn" onClick={() => setShowProfileSidebar(false)}>
+                ×
+              </button>
+            </div>
+
+            <div className="sidebar-content-custom">
+              <div className="sidebar-user-card">
+                <div className="sidebar-user-avatar">
+                  {profilePicture ? (
+                    <img src={profilePicture} alt="Profile avatar" />
+                  ) : (
+                    <span>{initials}</span>
+                  )}
+                </div>
+                <div className="sidebar-user-info">
+                  <h4>{userObj?.fullName || "Your Profile"}</h4>
+                  <p>{roleDisplay || "Staff Member"}</p>
+                </div>
+              </div>
+
+              <div className="sidebar-divider" />
+
+              <button type="button" className="sidebar-link" onClick={() => handleClick('/dashboard')}>
+                Dashboard
+              </button>
+              <button type="button" className="sidebar-link" onClick={() => handleClick('/records')}>
+                Medical Records
+              </button>
+              <button type="button" className="sidebar-link" onClick={() => handleClick('/chat')}>
+                Group Chat
+              </button>
+              <button type="button" className="sidebar-link" onClick={() => handleClick('/profile')}>
+                Account Settings
+              </button>
+              {role === 'admin' && (
+                <button type="button" className="sidebar-link" onClick={() => handleClick('/user')}>
+                  User Management
+                </button>
+              )}
+              <button type="button" className="sidebar-link" onClick={() => handleClick('/calendar')}>
+                Calendar
+              </button>
+              <button type="button" className="sidebar-link" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       )}

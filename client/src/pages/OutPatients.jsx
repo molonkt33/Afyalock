@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getInitials } from "../utils/getInitials";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/ActivePatients.css";
 
 function OutPatients() {
@@ -27,6 +27,7 @@ function OutPatients() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Role-based access for OutPatients:
   // - Admin, Doctor: Full access (view, add, edit, remove)
@@ -140,6 +141,24 @@ function OutPatients() {
         .finally(() => setLoading(false));
     });
   }, [token, navigate]);
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const detailsId = searchParams.get('details');
+    const searchQuery = searchParams.get('search');
+    
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+    
+    if (detailsId && patients.length > 0) {
+      const patient = patients.find(p => (p.id || p._id) === detailsId);
+      if (patient) {
+        setSelectedPatient(patient);
+        setShowDetailsModal(true);
+      }
+    }
+  }, [searchParams, patients]);
 
   // Access denied check
   if (!canViewPatients) {

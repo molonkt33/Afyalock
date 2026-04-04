@@ -36,7 +36,7 @@
 /* ================= BRAND ================= */
 
 .footer-brand {
-  font-family: "Russo One", sans-serif;
+  font-family: var(--base-font-family-default-latin);
   font-size: 28px;
   letter-spacing: 3px;
 }
@@ -58,7 +58,7 @@
 /* ================= LINKS ================= */
 
 .footer-heading {
-  font-family: "Russo One", sans-serif;
+  font-family: var(--base-font-family-default-latin);
   margin-bottom: 20px;
   letter-spacing: 1px;
 }

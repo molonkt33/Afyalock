@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/ActivePatients.css";
 
 function Emergency() {
@@ -28,6 +28,7 @@ function Emergency() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Role-based access for Emergency:
   // - Admin, Emergency Staff: Full access (view, admit emergency patients)
@@ -73,6 +74,24 @@ function Emergency() {
         .finally(() => setLoading(false));
     });
   }, [token, navigate]);
+
+  // Handle URL parameters for direct navigation
+  useEffect(() => {
+    const detailsId = searchParams.get('details');
+    const searchQuery = searchParams.get('search');
+    
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+    
+    if (detailsId && cases.length > 0) {
+      const emergencyCase = cases.find(c => (c.id || c._id) === detailsId);
+      if (emergencyCase) {
+        setSelectedCase(emergencyCase);
+        setShowDetailsModal(true);
+      }
+    }
+  }, [searchParams, cases]);
 
   // Access denied check
   if (!canViewEmergency) {
@@ -590,7 +609,7 @@ function Emergency() {
         .emergency-modal .modal-header h3 {
           margin: 0;
           color: #05254d;
-          font-family: "Poppins", sans-serif;
+          font-family: var(--base-font-family-default-latin);
         }
         .emergency-modal .modal-close {
           background: none;

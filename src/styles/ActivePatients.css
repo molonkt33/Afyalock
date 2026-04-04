@@ -15,7 +15,7 @@
 }
 
 .staff-title {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 32px;
   color: #05254d;
   margin: 0 0 8px 0;
@@ -65,7 +65,7 @@
 }
 
 .dashboard-card-header h2 {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   font-size: 22px;
   color: #05254d;
   margin: 0;
@@ -424,6 +424,7 @@
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   z-index: 1;
+  overflow: visible;
 }
 
 .patient-card:hover {
@@ -623,6 +624,9 @@
   transition: 0.2s ease;
   padding: 5px 10px;
   border-radius: 6px;
+  z-index: 100;
+  background: transparent;
+  border: none;
 }
 
 .card-menu:hover {
@@ -647,6 +651,7 @@
   animation: fadeIn 0.15s ease-in-out;
   border: 1px solid #e2e8f0;
   pointer-events: auto;
+  display: block;
 }
 
 .dropdown-menu div {
@@ -658,6 +663,9 @@
   align-items: center;
   gap: 10px;
   pointer-events: auto;
+  background: white;
+  color: #05254d;
+  border: none;
 }
 
 .dropdown-menu div:hover {
@@ -868,7 +876,7 @@
 }
 
 .access-denied h3 {
-  font-family: "Russo One", sans-serif;
+  font-family: 'Pin Sans', sans-serif;
   color: #05254d;
   margin-bottom: 10px;
 }

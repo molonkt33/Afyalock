@@ -9,7 +9,7 @@
 
 .modal-header h3 {
   color: white !important;
-  font-family: "Poppins", sans-serif;
+  font-family: var(--base-font-family-default-latin);
   margin: 0 !important;
 }
 
