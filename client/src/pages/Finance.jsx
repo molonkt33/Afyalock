@@ -308,7 +308,7 @@ const Finance = () => {
       {/* Add Payment Modal */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
+          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3><i className="fa-solid fa-plus me-2"></i>New Payment Record</h3>
               <button className="modal-close" onClick={() => setShowAddModal(false)}>×</button>
