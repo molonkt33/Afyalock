@@ -164,7 +164,13 @@ function ActivePatients() {
 
   const filtered = patients.filter((p) =>
     p.fullName?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPatients.includes(a.id || a._id);
+    const bStarred = starredPatients.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   return (
     <div className="d-flex">
@@ -265,7 +271,7 @@ function ActivePatients() {
           ) : (
             <div className="card-grid">
               {filtered.map((patient) => (
-                <div key={patient.id || patient._id} className="patient-card">
+                <div key={patient.id || patient._id} className={`patient-card ${starredPatients.includes(patient.id || patient._id) ? 'starred' : ''}`}>
                   <div className="patient-avatar">
                     {patient.profilePicture ? (
                       <img 

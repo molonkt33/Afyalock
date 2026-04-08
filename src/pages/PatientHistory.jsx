@@ -63,7 +63,13 @@ function PatientHistory() {
 
   const filtered = history.filter((patient) =>
     patient.fullName?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPatients.includes(a.id || a._id);
+    const bStarred = starredPatients.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   // Handle star/favorite patient
   const handleStarPatient = (patientId) => {
@@ -192,7 +198,7 @@ function PatientHistory() {
           ) : (
             <div className="card-grid">
               {filtered.map((patient) => (
-                <div key={patient.id || patient._id} className="patient-card history-card">
+                <div key={patient.id || patient._id} className={`patient-card history-card ${starredPatients.includes(patient.id || patient._id) ? 'starred' : ''}`}>
                   <div className="patient-avatar">
                     {patient.profilePicture ? (
                       <img 

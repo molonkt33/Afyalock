@@ -18,6 +18,22 @@ export const createPayment = async (paymentData) => {
   return data;
 };
 
+// Initiate M-Pesa STK Push
+export const initiateMpesaSTK = async (phoneNumber, amount, invoiceNumber) => {
+  const { data } = await api.post("/finance/mpesa/stk", {
+    phoneNumber,
+    amount,
+    invoiceNumber,
+  });
+  return data;
+};
+
+// Query M-Pesa STK Status
+export const queryMpesaSTKStatus = async (checkoutRequestID) => {
+  const { data } = await api.post("/finance/mpesa/query", { checkoutRequestID });
+  return data;
+};
+
 // Update payment
 export const updatePayment = async (id, paymentData) => {
   const { data } = await api.put(`/finance/payments/${id}`, paymentData);

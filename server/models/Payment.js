@@ -45,6 +45,7 @@ const paymentSchema = new mongoose.Schema({
   // M-Pesa specific
   mpesaPhone: String,
   checkoutRequestId: String,
+  mpesaReceiptNumber: String,
   resultCode: String,
 
   // Audit

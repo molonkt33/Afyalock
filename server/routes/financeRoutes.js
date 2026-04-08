@@ -7,7 +7,8 @@ import {
   deletePayment,
   getRevenueReport,
   initiateStkPush,
-  queryStkStatus
+  queryStkStatus,
+  handleMpesaCallback
 } from "../controllers/financeController.js";
 import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
 
@@ -72,5 +73,11 @@ router.post("/mpesa/stk", protect, authorizeRoles("reception", "admin"), initiat
  */
 router.post("/mpesa/query", protect, authorizeRoles("reception", "admin"), queryStkStatus);
 
-export default router;
+/**
+ * @route   POST /api/finance/mpesa/callback
+ * @desc    M-Pesa STK Push callback endpoint
+ * @access  Public
+ */
+router.post("/mpesa/callback", handleMpesaCallback);
 
+export default router;

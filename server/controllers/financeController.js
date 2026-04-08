@@ -56,7 +56,11 @@ const createPayment = asyncHandler(async (req, res) => {
     prescription,
     invoiceNumber,
     mpesaPhone,
-    notes
+    notes,
+    status,
+    mpesaReceiptNumber,
+    checkoutRequestId,
+    resultCode
   } = req.body;
 
   if (!amount || !paymentMethod || !patient || !invoiceNumber) {
@@ -70,7 +74,10 @@ const createPayment = asyncHandler(async (req, res) => {
     ...req.body,
     paymentReference: paymentRef,
     processedBy: req.user._id,
-    status: "pending" // Default until processed
+    status: status || "pending",
+    mpesaReceiptNumber,
+    checkoutRequestId,
+    resultCode
   });
 
   const populated = await Payment.findById(payment._id)
@@ -81,6 +88,53 @@ const createPayment = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     data: populated
+  });
+});
+
+// @desc    Handle M-Pesa STK callback
+const handleMpesaCallback = asyncHandler(async (req, res) => {
+  const callback = req.body?.Body?.stkCallback;
+
+  if (!callback) {
+    res.status(400);
+    throw new Error("Invalid STK callback payload");
+  }
+
+  const {
+    MerchantRequestID,
+    CheckoutRequestID,
+    ResultCode,
+    ResultDesc,
+    CallbackMetadata
+  } = callback;
+
+  const items = CallbackMetadata?.Item || [];
+  const mpesaReceiptNumber = items.find((item) => item.Name === "MpesaReceiptNumber")?.Value;
+  const amount = items.find((item) => item.Name === "Amount")?.Value;
+  const phoneNumber = items.find((item) => item.Name === "PhoneNumber")?.Value;
+  const accountReference = items.find((item) => item.Name === "AccountReference")?.Value;
+
+  const payment = await Payment.findOne({ checkoutRequestId: CheckoutRequestID })
+    .populate("patient")
+    .populate("prescription")
+    .populate("processedBy");
+
+  if (payment) {
+    payment.status = ResultCode === 0 ? "paid" : "failed";
+    payment.resultCode = ResultCode.toString();
+    payment.mpesaReceiptNumber = mpesaReceiptNumber;
+    payment.checkoutRequestId = CheckoutRequestID;
+    payment.mpesaPhone = payment.mpesaPhone || phoneNumber;
+    await payment.save();
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "STK callback processed",
+    matchedPayment: !!payment,
+    checkoutRequestId: CheckoutRequestID,
+    resultCode: ResultCode,
+    resultDesc: ResultDesc
   });
 });
 
@@ -236,6 +290,7 @@ export {
   deletePayment,
   getRevenueReport,
   initiateStkPush,
-  queryStkStatus
+  queryStkStatus,
+  handleMpesaCallback
 };
 

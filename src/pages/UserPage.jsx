@@ -9,6 +9,7 @@ function UserPage() {
   const [view, setView] = useState("card");
   const [showMenu, setShowMenu] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [starredUsers, setStarredUsers] = useState([]);
   
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -122,7 +123,13 @@ function UserPage() {
     u.fullName?.toLowerCase().includes(search.toLowerCase()) ||
     u.email?.toLowerCase().includes(search.toLowerCase()) ||
     u.role?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredUsers.includes(a.id || a._id);
+    const bStarred = starredUsers.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
 
 
@@ -272,6 +279,16 @@ function UserPage() {
     setShowPasswordModal(true);
   };
 
+  // Handle star/favorite user
+  const handleStarUser = (userId) => {
+    if (starredUsers.includes(userId)) {
+      setStarredUsers(starredUsers.filter(id => id !== userId));
+    } else {
+      setStarredUsers([...starredUsers, userId]);
+    }
+    setShowMenu(null);
+  };
+
   return (
     <div className="d-flex">
       <div className="flex-grow-1 p-5">
@@ -383,7 +400,7 @@ function UserPage() {
           ) : (
             <div className="card-grid">
               {filtered.map((user) => (
-                <div key={user.id || user._id} className="patient-card staff-card">
+                <div key={user.id || user._id} className={`patient-card staff-card ${starredUsers.includes(user.id || user._id) ? 'starred' : ''}`}>
                   <div className="staff-avatar">
                     {user.profilePicture ? (
                       <img 
@@ -436,8 +453,8 @@ function UserPage() {
                         <i className="fa-solid fa-key"></i> Reset Password
                       </div>
 
-                      <div>
-                        <i className="fa-solid fa-star"></i> Star User
+                      <div onClick={() => handleStarUser(user.id || user._id)}>
+                        <i className="fa-solid fa-star"></i> {starredUsers.includes(user.id || user._id) ? "Unstar User" : "Star User"}
                       </div>
 
                       {canRemoveUser && (

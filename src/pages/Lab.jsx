@@ -94,7 +94,13 @@ function Lab() {
   const filtered = reports.filter((r) =>
     r.testName?.toLowerCase().includes(search.toLowerCase()) ||
     r.patient?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredReports.includes(a._id);
+    const bStarred = starredReports.includes(b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   // ================= FILE UPLOAD =================
   const handleUpload = async (reportId) => {
@@ -336,7 +342,7 @@ function Lab() {
               {filtered.map((report) => (
                 <div
                   key={report._id}
-                  className={`patient-card ${getStatusClass(report.status)}`}
+                  className={`patient-card ${getStatusClass(report.status)} ${starredReports.includes(report._id) ? 'starred' : ''}`}
                 >
                   <div className="card-icon lab-icon"></div>
 

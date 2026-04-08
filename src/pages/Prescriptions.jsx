@@ -69,7 +69,13 @@ const Prescriptions = () => {
     p.patientFullName?.toLowerCase().includes(search.toLowerCase()) ||
     p.patient?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
     p.medications.some(m => m.name.toLowerCase().includes(search.toLowerCase()))
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPrescriptions.includes(a._id || a.id);
+    const bStarred = starredPrescriptions.includes(b._id || b.id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   // Handle patient search
   const filteredPatients = patients.filter(patient =>
@@ -288,7 +294,7 @@ const Prescriptions = () => {
         ) : (
           <div className="card-grid">
             {filteredPrescriptions.map((prescription) => (
-              <div key={prescription._id || prescription.id} className="prescription-card">
+              <div key={prescription._id || prescription.id} className={`prescription-card ${starredPrescriptions.includes(prescription._id || prescription.id) ? 'starred' : ''}`}>
                 <div className="prescription-header">
                   <div className="prescription-icon">
                     <i className="fa-solid fa-prescription-bottle"></i>

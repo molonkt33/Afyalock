@@ -92,7 +92,13 @@ function Radiology() {
   const filtered = scans.filter((scan) =>
     scan.fullName?.toLowerCase().includes(search.toLowerCase()) ||
     scan.scanType?.toLowerCase().includes(search.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const aStarred = starredScans.includes(a.id || a._id);
+    const bStarred = starredScans.includes(b.id || b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   const getPriorityClass = (priority) => {
     if (priority === "Urgent") return "scan-urgent";
@@ -342,7 +348,7 @@ function Radiology() {
               {filtered.map((scan) => (
                 <div
                   key={scan.id || scan._id}
-                  className={`patient-card ${getPriorityClass(scan.priority)} ${getStatusClass(scan.status)}`}
+                  className={`patient-card ${getPriorityClass(scan.priority)} ${getStatusClass(scan.status)} ${starredScans.includes(scan.id || scan._id) ? 'starred' : ''}`}
                 >
                   <div className="card-icon radiology-icon"></div>
 

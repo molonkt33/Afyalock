@@ -60,15 +60,17 @@ app.use(limiter);
 app.use(
   cors({
     origin: function (origin, callback) {
+        const clientUrl = process.env.CLIENT_URL || 'http://app.medvault.local:5173';
         const allowedOrigins = [
-          "http://localhost:5173", // Vite
-          "http://localhost:3000", // CRA (optional)
+          clientUrl,
+          "http://localhost:5173", // Vite (fallback for development)
+          "http://localhost:3000", // CRA (optional fallback)
         ];
 
         // Production: allow only the configured client URL
         if (
           process.env.NODE_ENV === "production" &&
-          origin === process.env.CLIENT_URL
+          origin === clientUrl
         ) {
           return callback(null, true);
         }
@@ -76,13 +78,21 @@ app.use(
         // Allow requests without origin (curl, server-to-server)
         if (!origin) return callback(null, true);
 
-        // Allow explicitly configured dev origins
+        // Allow explicitly configured origins
         if (allowedOrigins.includes(origin)) return callback(null, true);
 
         // In development, accept any localhost origin (different dev ports)
         if (
           process.env.NODE_ENV !== "production" &&
           /^https?:\/\/localhost(?::\d+)?$/.test(origin)
+        ) {
+          return callback(null, true);
+        }
+
+        // In development, accept private domain origin
+        if (
+          process.env.NODE_ENV !== "production" &&
+          /^https?:\/\/[a-z]+\.medvault\.local(?::\d+)?$/.test(origin)
         ) {
           return callback(null, true);
         }

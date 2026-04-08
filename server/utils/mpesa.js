@@ -127,11 +127,14 @@ export const queryMpesaSTKStatus = async (checkoutRequestID) => {
       }
     );
 
+    const metadataItems = response.data?.CallbackMetadata?.Item || response.data?.ResultParameters?.ResultParameter || [];
+    const mpesaReceiptNumber = metadataItems.find((item) => item.Name === "MpesaReceiptNumber")?.Value || null;
+
     return {
       success: true,
       resultCode: response.data.ResultCode,
       resultDesc: response.data.ResultDesc,
-      mpesaReceiptNumber: response.data.MpesaReceiptNumber,
+      mpesaReceiptNumber,
     };
   } catch (error) {
     console.error("❌ M-Pesa Query Error:", error.response?.data || error.message);

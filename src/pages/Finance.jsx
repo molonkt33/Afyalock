@@ -23,6 +23,7 @@ const Finance = () => {
   // M-Pesa STK state
   const [stkStatus, setStkStatus] = useState(null);
   const [checkoutRequestID, setCheckoutRequestID] = useState(null);
+  const [stkReceiptNumber, setStkReceiptNumber] = useState(null);
   const [stkLoading, setStkLoading] = useState(false);
 
   // New payment form
@@ -72,7 +73,13 @@ const Finance = () => {
     p.invoiceNumber?.toLowerCase().includes(search.toLowerCase()) ||
     p.amount.toString().includes(search) ||
     (filterMethod !== "all" && p.paymentMethod === filterMethod)
-  );
+  ).sort((a, b) => {
+    const aStarred = starredPayments.includes(a._id);
+    const bStarred = starredPayments.includes(b._id);
+    if (aStarred && !bStarred) return -1;
+    if (!aStarred && bStarred) return 1;
+    return 0;
+  });
 
   const getMethodIcon = (method) => {
     const icons = {
@@ -116,6 +123,7 @@ const Finance = () => {
     setPatientSearch("");
     setStkStatus(null);
     setCheckoutRequestID(null);
+    setStkReceiptNumber(null);
     setShowAddModal(true);
   };
 
@@ -151,6 +159,7 @@ const Finance = () => {
       if (stkResponse.success) {
         setCheckoutRequestID(stkResponse.data.checkoutRequestID);
         setStkStatus("initiated");
+        setStkReceiptNumber(null);
         
         // Show notification
         alert(`✅ M-Pesa prompt sent to ${newPayment.mpesaPhone}. Please enter your PIN to complete payment.`);
@@ -165,18 +174,21 @@ const Finance = () => {
             if (statusResponse.data.isSuccess) {
               clearInterval(pollInterval);
               setStkStatus("success");
+              setStkReceiptNumber(statusResponse.data.mpesaReceiptNumber || null);
               
               // Now create payment in database with status "paid"
               const paymentData = {
                 ...newPayment,
                 status: "paid",
-                mpesaRef: statusResponse.data.mpesaReceiptNumber
+                mpesaReceiptNumber: statusResponse.data.mpesaReceiptNumber,
+                checkoutRequestId: stkResponse.data.checkoutRequestID,
+                resultCode: statusResponse.data.resultCode
               };
 
               const result = await createPayment(paymentData);
               setPayments([result.data, ...payments]);
               
-              alert("✅ Payment successful! M-Pesa transaction completed.");
+              alert(`✅ Payment successful! Receipt: ${statusResponse.data.mpesaReceiptNumber || "N/A"}`);
               
               // Reset form
               setShowAddModal(false);
@@ -192,7 +204,8 @@ const Finance = () => {
               setSelectedPatient(null);
               setCheckoutRequestID(null);
               setStkStatus(null);
-            } else if (statusResponse.data.resultCode !== "0" && pollCount > 30) {
+              setStkReceiptNumber(null);
+            } else if (pollCount > 30) {
               // Payment failed or timeout
               clearInterval(pollInterval);
               setStkStatus("failed");
@@ -203,7 +216,9 @@ const Finance = () => {
               if (confirmSave) {
                 const result = await createPayment({
                   ...newPayment,
-                  status: "pending"
+                  status: "pending",
+                  checkoutRequestId: stkResponse.data.checkoutRequestID,
+                  resultCode: statusResponse.data.resultCode
                 });
                 setPayments([result.data, ...payments]);
                 setShowAddModal(false);
@@ -217,6 +232,7 @@ const Finance = () => {
                   notes: ""
                 });
                 setSelectedPatient(null);
+                setStkStatus(null);
               }
             }
           } catch (err) {
@@ -269,7 +285,7 @@ const Finance = () => {
     
     // If M-Pesa, use STK flow
     if (newPayment.paymentMethod === "mpesa") {
-      handleMpesaPayment(e);
+      await handleMpesaPayment(e);
       return;
     }
 
@@ -460,7 +476,7 @@ const Finance = () => {
         ) : (
           <div className="card-grid">
             {filteredPayments.map((payment) => (
-              <div key={payment._id} className="prescription-card">
+              <div key={payment._id} className={`prescription-card ${starredPayments.includes(payment._id) ? 'starred' : ''}`}>
                 <div className="prescription-header">
                   <div className="prescription-icon" style={{ backgroundColor: getMethodColor(payment.paymentMethod) }}>
                     <i className={getMethodIcon(payment.paymentMethod)}></i>
@@ -626,9 +642,14 @@ const Finance = () => {
                 })
               }}>
                 <i className={`fa-solid ${stkStatus === 'initiated' ? 'fa-hourglass-middle' : stkStatus === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`} style={{ marginRight: '8px' }}></i>
-                {stkStatus === 'initiated' && '📱 M-Pesa prompt sent, waiting for PIN entry...'}
+                {stkStatus === 'initiated' && '📱 M-Pesa prompt sent. Waiting for you to enter your PIN...'}
                 {stkStatus === 'success' && '✅ Payment successful!'}
                 {stkStatus === 'failed' && '❌ Payment failed. You can retry or save as pending.'}
+                {stkStatus === 'success' && stkReceiptNumber && (
+                  <div style={{ marginTop: '8px', fontWeight: '600' }}>
+                    Receipt: {stkReceiptNumber}
+                  </div>
+                )}
               </div>
             )}
 
@@ -682,21 +703,41 @@ const Finance = () => {
 
               {/* Show M-Pesa Phone field when M-Pesa is selected */}
               {newPayment.paymentMethod === "mpesa" && (
-                <div className="form-group">
-                  <label>M-Pesa Phone *</label>
-                  <input
-                    type="tel"
-                    className="form-control"
-                    value={newPayment.mpesaPhone}
-                    onChange={(e) => setNewPayment({ ...newPayment, mpesaPhone: e.target.value })}
-                    placeholder="2547XXXXXXXX (e.g., 254712345678)"
-                    required
-                    disabled={stkLoading}
-                  />
-                  <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
-                    💡 Format: 254XXXXXXXXX or 07XXXXXXXX (Kenya)
-                  </small>
-                </div>
+                <>
+                  <div className="form-group">
+                    <label>M-Pesa Phone *</label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      value={newPayment.mpesaPhone}
+                      onChange={(e) => setNewPayment({ ...newPayment, mpesaPhone: e.target.value })}
+                      placeholder="2547XXXXXXXX (e.g., 254712345678)"
+                      required
+                      disabled={stkLoading}
+                    />
+                    <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                      💡 Format: 254XXXXXXXXX or 07XXXXXXXX (Kenya)
+                    </small>
+                  </div>
+
+                  {(newPayment.amount && newPayment.invoiceNumber && newPayment.mpesaPhone) && (
+                    <div style={{
+                      padding: '16px',
+                      margin: '0 0 16px 0',
+                      borderRadius: '10px',
+                      background: '#eff6ff',
+                      border: '1px solid #93c5fd',
+                      color: '#0f172a'
+                    }}>
+                      <strong>Confirm M-Pesa Prompt</strong>
+                      <div style={{ marginTop: '8px' }}>
+                        You are about to pay <strong>KES {Number(newPayment.amount).toLocaleString()}</strong> to <strong>MedVault</strong>.
+                      </div>
+                      <div>Phone: <strong>{newPayment.mpesaPhone}</strong></div>
+                      <div>Invoice: <strong>#{newPayment.invoiceNumber}</strong></div>
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="form-group">
