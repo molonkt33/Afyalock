@@ -65,21 +65,22 @@ app.use(
           clientUrl,
           "http://localhost:5173", // Vite (fallback for development)
           "http://localhost:3000", // CRA (optional fallback)
+          "https://afyalock.vercel.app", // Vercel production deployment
         ];
 
-        // Production: allow only the configured client URL
+        // Allow requests without origin (curl, server-to-server, same-domain requests)
+        if (!origin) return callback(null, true);
+
+        // Allow explicitly configured origins
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+
+        // Production: allow configured CLIENT_URL
         if (
           process.env.NODE_ENV === "production" &&
           origin === clientUrl
         ) {
           return callback(null, true);
         }
-
-        // Allow requests without origin (curl, server-to-server)
-        if (!origin) return callback(null, true);
-
-        // Allow explicitly configured origins
-        if (allowedOrigins.includes(origin)) return callback(null, true);
 
         // In development, accept any localhost origin (different dev ports)
         if (
@@ -94,6 +95,11 @@ app.use(
           process.env.NODE_ENV !== "production" &&
           /^https?:\/\/[a-z]+\.medvault\.local(?::\d+)?$/.test(origin)
         ) {
+          return callback(null, true);
+        }
+
+        // In development, allow any origin
+        if (process.env.NODE_ENV !== "production") {
           return callback(null, true);
         }
 

@@ -201,7 +201,6 @@ function Layout() {
 function App() {
   return (
     <Router>
-      <link rel="stylesheet" href="/src/styles/modals.css" />
       <Layout />
     </Router>
   );
